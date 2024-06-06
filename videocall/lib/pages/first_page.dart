@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../data/data_center.dart';
 import './signin_page.dart';
+import './signup_page.dart';
 
 class FirstPage extends StatefulWidget {
   @override
@@ -78,7 +77,12 @@ class _FirstPageState extends State<FirstPage> {
                       ),
                       Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SignUpPage()));
+                        },
                         child: Text(
                           'Sign up',
                           style: TextStyle(fontSize: 20, color: Colors.black),
