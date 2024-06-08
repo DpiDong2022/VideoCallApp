@@ -34,6 +34,9 @@ dependencies:
   path_provider: ^2.0.10
   json_annotation: ^4.5.0
   shared_preferences: ^2.0.13
+  sqflite: ^2.0.0+4
+  intl : ^0.17.0
+  path: any
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -65,6 +68,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/
+    - assets/videocall.db
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

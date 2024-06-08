@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:videocall/controllers/user_controller.dart';
+import 'package:videocall/database/user_db.dart';
+import 'package:videocall/models/user.dart';
 import 'package:videocall/pages/first_page.dart';
-import './signin_page.dart';
-import './signup_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +15,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Future<List<User>>? futureUsers;
+  final userDB = UserDB();
+
   // ignore: non_constant_identifier_names
   ButtonStyle CustomButtonStyle() {
     return ButtonStyle(
@@ -21,6 +27,23 @@ class _HomePageState extends State<HomePage> {
             RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(27),
                 side: const BorderSide(color: Colors.white))));
+  }
+
+  late final UserController _userController;
+  @override
+  void initState() {
+    super.initState();
+    _userController = UserController();
+    setState(() {
+      userDB.create(
+          user: User(
+              name: "phung dai dong",
+              phone: "0368728267",
+              password: "123",
+              image: "dong.png",
+              isUsing: true));
+      futureUsers = userDB.fetchAll();
+    });
   }
 
   @override
@@ -60,6 +83,42 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               padding: const EdgeInsets.all(160),
+            ),
+            Expanded(
+              child: FutureBuilder<List<User>>(
+                future: futureUsers,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    final users = snapshot.data!;
+                    if (users.isNotEmpty) {
+                      return ListView.separated(
+                          itemBuilder: (context, index) {
+                            final user = users[index];
+                            return Column(
+                              children: [
+                                Text(user.id!.toString()),
+                                Text(user.name),
+                                Text(user.phone),
+                                Text(user.image),
+                                Text(user.password),
+                                Text(user.isUsing.toString()),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(height: 12);
+                          },
+                          itemCount: users.length);
+                    } else {
+                      return const Text('hello');
+                    }
+                  }
+                },
+              ),
             ),
             Expanded(
               child: Container(
