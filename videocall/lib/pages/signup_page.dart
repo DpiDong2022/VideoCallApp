@@ -65,11 +65,13 @@ class _SignUpPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextFormField(
+                    style: const TextStyle(fontSize: 20, height: 0.8),
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Your phone number',
-                        prefixIcon: Icon(Icons.phone)),
+                        prefixIcon: Icon(Icons.phone),
+                        focusedBorder: UnderlineInputBorder()),
                   ),
                   // const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                   // TextFormField(
@@ -92,7 +94,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               height: 100,
               child: const Row(
                 children: [

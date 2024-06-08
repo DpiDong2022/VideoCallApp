@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:videocall/pages/first_page.dart';
 import './signin_page.dart';
 import './signup_page.dart';
 
-class FirstPage extends StatefulWidget {
-  const FirstPage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _FirstPageState createState() => _FirstPageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _FirstPageState extends State<FirstPage> {
+class _HomePageState extends State<HomePage> {
   // ignore: non_constant_identifier_names
   ButtonStyle CustomButtonStyle() {
     return ButtonStyle(
@@ -44,7 +45,7 @@ class _FirstPageState extends State<FirstPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'Get Started',
+                      'Home',
                       textAlign: TextAlign.start,
                       style:
                           TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
@@ -70,28 +71,15 @@ class _FirstPageState extends State<FirstPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const SignInPage()));
+                                builder: (context) => const FirstPage()));
                       },
                       style: CustomButtonStyle(),
                       child: const Text(
-                        'Sign in',
+                        'First page',
                         style: TextStyle(fontSize: 20, color: Colors.black),
                       ),
                     ),
                     const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignUpPage()));
-                      },
-                      style: CustomButtonStyle(),
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(fontSize: 20, color: Colors.black),
-                      ),
-                    )
                   ],
                 ),
               ),

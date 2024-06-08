@@ -13,7 +13,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final DataCenter dataCenter;
 
-  MyApp({required this.dataCenter});
+  const MyApp({super.key, required this.dataCenter});
 
   @override
   Widget build(BuildContext context) {
