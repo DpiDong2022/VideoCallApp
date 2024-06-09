@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:videocall/helpers/ui_common.dart';
 import './signin_page.dart';
 import './signup_page.dart';
 
@@ -12,15 +13,6 @@ class FirstPage extends StatefulWidget {
 
 class _FirstPageState extends State<FirstPage> {
   // ignore: non_constant_identifier_names
-  ButtonStyle CustomButtonStyle() {
-    return ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.white),
-        fixedSize: MaterialStateProperty.all(const Size(300, 58)),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(27),
-                side: const BorderSide(color: Colors.white))));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,11 +64,8 @@ class _FirstPageState extends State<FirstPage> {
                             MaterialPageRoute(
                                 builder: (context) => const SignInPage()));
                       },
-                      style: CustomButtonStyle(),
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(fontSize: 20, color: Colors.black),
-                      ),
+                      style: UICommon.customButtonStyle(),
+                      child: const Text('Sign in'),
                     ),
                     const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
                     TextButton(
@@ -86,11 +75,8 @@ class _FirstPageState extends State<FirstPage> {
                             MaterialPageRoute(
                                 builder: (context) => const SignUpPage()));
                       },
-                      style: CustomButtonStyle(),
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(fontSize: 20, color: Colors.black),
-                      ),
+                      style: UICommon.customButtonStyle(),
+                      child: const Text('Sign up'),
                     )
                   ],
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:videocall/helpers/ui_common.dart';
 import 'package:videocall/pages/forgot_password.dart';
 import 'package:videocall/pages/home_page.dart';
 import 'package:videocall/database/user_db.dart';
@@ -18,18 +19,6 @@ class _SignInPageState extends State<SignInPage> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _userDB = UserDB(); // Database helper
-
-  ButtonStyle customButtonStyle() {
-    return ButtonStyle(
-      fixedSize: MaterialStateProperty.all(const Size(300, 58)),
-      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(27),
-          side: const BorderSide(color: Colors.white),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,21 +72,8 @@ class _SignInPageState extends State<SignInPage> {
                       controller: _phoneController,
                       style: const TextStyle(fontSize: 20, height: 0.8),
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Your phone number',
-                        prefixIcon: Icon(Icons.phone),
-                        focusedBorder: UnderlineInputBorder(),
-                        focusedErrorBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.red,
-                            width: 2.0,
-                          ),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(width: 0.6),
-                        ),
-                      ),
+                      decoration: UICommon.customDecoration(
+                          labelText: 'Phone number', prefixIcon: Icons.phone),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your phone number';
@@ -115,8 +91,14 @@ class _SignInPageState extends State<SignInPage> {
                       obscureText: _isHidePassword,
                       decoration: InputDecoration(
                         border: const OutlineInputBorder(),
-                        hintText: 'Password',
-                        prefixIcon: const Icon(Icons.vpn_key),
+                        labelText: 'Password',
+                        labelStyle: const TextStyle(color: Colors.black),
+                        errorStyle:
+                            const TextStyle(fontWeight: FontWeight.bold),
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: Colors.black,
+                        ),
                         suffixIcon: IconButton(
                           color: Colors.black,
                           onPressed: () {
@@ -189,11 +171,8 @@ class _SignInPageState extends State<SignInPage> {
                     children: [
                       TextButton(
                         onPressed: _signIn, // Handle sign-in logic
-                        style: customButtonStyle(),
-                        child: const Text(
-                          'Sign in',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
-                        ),
+                        style: UICommon.customButtonStyle(),
+                        child: const Text('Login'),
                       ),
                       const Padding(
                           padding: EdgeInsets.symmetric(vertical: 10)),
@@ -201,10 +180,9 @@ class _SignInPageState extends State<SignInPage> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        style: customButtonStyle(),
+                        style: UICommon.customButtonStyle(),
                         child: const Text(
                           'Back to previous',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
                         ),
                       ),
                     ],
@@ -234,10 +212,10 @@ class _SignInPageState extends State<SignInPage> {
             MaterialPageRoute(builder: (context) => const HomePage()),
           );
         } else {
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Invalid phone number or password')),
-          );
+          UICommon.customScaffoldMessager(
+              context: context,
+              message: 'Invalid phone number or password!',
+              duration: const Duration(milliseconds: 600));
         }
       }
     }

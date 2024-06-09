@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:videocall/controllers/user_controller.dart';
 import 'package:videocall/database/user_db.dart';
 import 'package:videocall/models/user.dart';
 import 'package:videocall/pages/first_page.dart';
@@ -29,11 +28,9 @@ class _HomePageState extends State<HomePage> {
                 side: const BorderSide(color: Colors.white))));
   }
 
-  late final UserController _userController;
   @override
   void initState() {
     super.initState();
-    _userController = UserController();
     setState(() {
       userDB.create(
           user: User(

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:videocall/database/user_db.dart';
+import 'package:videocall/helpers/ui_common.dart';
+import 'package:videocall/models/user.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -14,11 +17,45 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   final _codeController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final _userDB = UserDB();
+
+  // FocusNodes for managing the focus state of the input fields
+  final FocusNode _phoneFocusNode = FocusNode();
+  final FocusNode _codeFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+
+    // Autofocus the first input field when the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _phoneFocusNode.requestFocus();
+    });
+
+    // Listen for tab changes to autofocus the respective input field
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        switch (_tabController.index) {
+          case 0:
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _phoneFocusNode.requestFocus();
+            });
+            break;
+          case 1:
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _codeFocusNode.requestFocus();
+            });
+            break;
+          case 2:
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _passwordFocusNode.requestFocus();
+            });
+            break;
+        }
+      }
+    });
   }
 
   @override
@@ -27,40 +64,67 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
     _phoneController.dispose();
     _codeController.dispose();
     _passwordController.dispose();
+    _phoneFocusNode.dispose();
+    _codeFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
-  }
-
-  void _sendCode() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // Simulate sending code
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Verification code sent to your phone.')),
-      );
-      _tabController.animateTo(1); // Move to the next tab
-    }
   }
 
   void _verifyCode() {
     // Simulate code verification
     if (_codeController.text.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Code verified successfully.')),
-      );
+      UICommon.customScaffoldMessager(
+          context: context,
+          message: 'Code verified successfully.',
+          duration: const Duration(seconds: 1));
       _tabController.animateTo(2); // Move to the next tab
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter the verification code.')),
-      );
+      UICommon.customScaffoldMessager(
+          context: context,
+          message: 'Please enter the verification code.',
+          duration: const Duration(milliseconds: 1500));
     }
   }
 
-  void _resetPassword() {
+  void _resetPassword() async {
     if (_formKey.currentState?.validate() ?? false) {
       // Simulate password reset
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password has been reset.')),
-      );
-      Navigator.pop(context); // Go back to the previous screen
+      var isSuccessed = await _userDB.changePassword(
+          _phoneController.text.trim(), _passwordController.text.trim());
+      if (mounted) {
+        if (isSuccessed) {
+          UICommon.customScaffoldMessager(
+              context: context,
+              message: 'Password has been reset.',
+              duration: const Duration(milliseconds: 1000));
+          Navigator.pop(context);
+        } else {
+          UICommon.customScaffoldMessager(
+              context: context,
+              message: 'Something went wrong! Software is updating...',
+              duration: const Duration(milliseconds: 1500));
+        }
+      } // Go back to the previous screen
+    }
+  }
+
+  void _validatePhoneNumber() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      var user = await _userDB.fetchByPhone(_phoneController.text.trim());
+      if (mounted) {
+        if (user == null) {
+          UICommon.customScaffoldMessager(
+              context: context,
+              message: 'Your phone number has not been registered yet.',
+              duration: const Duration(milliseconds: 1400));
+        } else {
+          UICommon.customScaffoldMessager(
+              context: context,
+              message: 'Verification code sent to your phone.',
+              duration: const Duration(milliseconds: 1400));
+          _tabController.animateTo(1); // Move to the next tab
+        }
+      }
     }
   }
 
@@ -69,19 +133,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Forgot Password'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Phone'),
-            Tab(text: 'Code'),
-            Tab(text: 'Password'),
-          ],
-        ),
       ),
       body: Form(
         key: _formKey,
         child: TabBarView(
           controller: _tabController,
+          physics:
+              const NeverScrollableScrollPhysics(), // Prevent swipe navigation
           children: [
             _buildPhoneNumberTab(),
             _buildVerificationCodeTab(),
@@ -93,124 +151,131 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   }
 
   Widget _buildPhoneNumberTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Enter your phone number to reset your password:',
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
-          TextFormField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Phone Number',
-              prefixIcon: Icon(Icons.phone),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Centers the Column's content
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              'Enter your phone number to reset your password:',
+              style: TextStyle(fontSize: 16),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your phone number';
-              }
-              if (value.length != 10) {
-                return 'Phone number must be 10 digits';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _sendCode,
-              child: const Text('Send Code'),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              style: const TextStyle(fontSize: 20, height: 0.8),
+              focusNode: _phoneFocusNode, // Attach the FocusNode
+              decoration: UICommon.customDecoration(
+                  labelText: 'Phone number', prefixIcon: Icons.phone),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your phone number';
+                }
+                if (value.length != 10) {
+                  return 'Phone number must be 10 digits';
+                }
+                return null;
+              },
             ),
-          ),
-        ],
+            const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+            TextButton(
+              onPressed: _validatePhoneNumber, // Handle sign-in logic
+              style: UICommon.customButtonStyle(boderSideColor: Colors.black),
+              child: const Text(
+                'Send code',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildVerificationCodeTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Enter the verification code sent to your phone:',
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
-          TextFormField(
-            controller: _codeController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Verification Code',
-              prefixIcon: Icon(Icons.confirmation_number),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Centers the Column's content
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              'Enter the verification code sent to your phone:',
+              style: TextStyle(fontSize: 16),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter the verification code';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _verifyCode,
-              child: const Text('Verify Code'),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: _codeController,
+              style: const TextStyle(fontSize: 20, height: 0.8),
+              keyboardType: TextInputType.number,
+              focusNode: _codeFocusNode, // Attach the FocusNode
+              decoration: UICommon.customDecoration(
+                  labelText: 'Verification Code',
+                  prefixIcon: Icons.verified_user),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the verification code';
+                }
+                return null;
+              },
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: _verifyCode, // Handle sign-in logic
+              style: UICommon.customButtonStyle(boderSideColor: Colors.black),
+              child: const Text(
+                'Verify Code',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildNewPasswordTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Enter your new password:',
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
-          TextFormField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'New Password',
-              prefixIcon: Icon(Icons.lock),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Centers the Column's content
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              'Enter your new password:',
+              style: TextStyle(fontSize: 16),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your new password';
-              }
-              if (value.length < 6) {
-                return 'Password must be at least 6 characters long';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _resetPassword,
-              child: const Text('Reset Password'),
+            const SizedBox(height: 20),
+            TextFormField(
+              style: const TextStyle(fontSize: 20, height: 0.8),
+              controller: _passwordController,
+              obscureText: true,
+              focusNode: _passwordFocusNode, // Attach the FocusNode
+              decoration: UICommon.customDecoration(
+                  labelText: 'New password', prefixIcon: Icons.lock),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your new password';
+                }
+                if (value.length < 6) {
+                  return 'Password must be at least 6 characters long';
+                }
+                return null;
+              },
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: _resetPassword, // Handle sign-in logic
+              style: UICommon.customButtonStyle(boderSideColor: Colors.black),
+              child: const Text(
+                'Reset Password',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -35,6 +35,8 @@ dependencies:
   json_annotation: ^4.5.0
   shared_preferences: ^2.0.13
   sqflite: ^2.0.0+4
+  image_picker: ^0.8.4+3 # Check for the latest version
+  permission_handler: ^10.2.0 # Check for the latest version
   intl : ^0.17.0
   path: any
 

@@ -42,6 +42,5 @@ class User extends BaseModel {
     };
   }
 
-  @override
-  String get tableName => "user";
+  static String tableName = 'user';
 }
