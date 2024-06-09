@@ -31,6 +31,9 @@ class _SignUpPageState extends State<SignUpPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(() {
+      setState(() {}); // Update the UI when the tab index changes
+    });
   }
 
   @override
@@ -51,12 +54,12 @@ class _SignUpPageState extends State<SignUpPage>
           UICommon.customScaffoldMessager(
               context: context,
               message: 'Your phone number has been registered!',
-              duration: const Duration(milliseconds: 1000));
+              duration: const Duration(milliseconds: 2000));
         } else {
           UICommon.customScaffoldMessager(
               context: context,
               message: 'Verification code sent to your phone.',
-              duration: const Duration(milliseconds: 1000));
+              duration: const Duration(milliseconds: 2000));
           _tabController.animateTo(1); // Mo
         }
       }
@@ -68,13 +71,13 @@ class _SignUpPageState extends State<SignUpPage>
       UICommon.customScaffoldMessager(
           context: context,
           message: 'Code verified successfully.',
-          duration: const Duration(milliseconds: 800));
+          duration: const Duration(milliseconds: 2000));
       _tabController.animateTo(2);
     } else {
       UICommon.customScaffoldMessager(
           context: context,
           message: 'Please enter the verification code!',
-          duration: const Duration(milliseconds: 1000));
+          duration: const Duration(milliseconds: 2000));
     }
   }
 
@@ -83,7 +86,7 @@ class _SignUpPageState extends State<SignUpPage>
       UICommon.customScaffoldMessager(
           context: context,
           message: 'Password set successfully.',
-          duration: const Duration(milliseconds: 800));
+          duration: const Duration(milliseconds: 2000));
       _tabController.animateTo(3);
     }
   }
@@ -107,14 +110,14 @@ class _SignUpPageState extends State<SignUpPage>
       UICommon.customScaffoldMessager(
           context: context,
           message: 'Account created successfully.',
-          duration: const Duration(milliseconds: 1000));
+          duration: const Duration(milliseconds: 2000));
 
       // Clear fields or navigate to another screen as needed
     } else {
       UICommon.customScaffoldMessager(
           context: context,
           message: 'Please provide all details and avatar image!',
-          duration: const Duration(milliseconds: 1300));
+          duration: const Duration(milliseconds: 2000));
     }
   }
 
@@ -159,23 +162,37 @@ class _SignUpPageState extends State<SignUpPage>
               ),
             ),
             Expanded(
-              child: Form(
-                key: _formKey,
-                child: TabBarView(
-                  controller: _tabController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _buildPhoneNumberTab(),
-                    _buildVerificationCodeTab(),
-                    _buildPasswordTab(),
-                    _buildAccountDetailsTab(),
-                  ],
+                child: Column(
+              children: [
+                Expanded(
+                  child: Form(
+                    key: _formKey,
+                    child: TabBarView(
+                      controller: _tabController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        _buildPhoneNumberTab(),
+                        _buildVerificationCodeTab(),
+                        _buildPasswordTab(),
+                        _buildAccountDetailsTab(),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                  child: Text(
+                    '${_tabController.index + 1} / 4', // Display the current tab number
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.normal),
+                  ),
+                ),
+              ],
+            )),
             Container(
               width: 1000,
-              height: 200,
+              height: 250,
               color: Colors.transparent,
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Column(
@@ -194,11 +211,8 @@ class _SignUpPageState extends State<SignUpPage>
                       }
                     },
                     style: UICommon.customButtonStyle(),
-                    child: const Text(
-                      'Next',
-                    ),
+                    child: Text(_tabController.index != 3 ? "Next" : "Finish"),
                   ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: 10))
                 ],
               ),
             ),
@@ -211,25 +225,20 @@ class _SignUpPageState extends State<SignUpPage>
   Widget _buildPhoneNumberTab() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: UICommon.customDecoration(
-                  labelText: "Your phone number", prefixIcon: Icons.phone),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your phone number!';
-                } else if (value.length != 10) {
-                  return 'Phone number must be 10 digits!';
-                }
-                return null;
-              },
-            ),
-          ],
+        padding: const EdgeInsets.symmetric(horizontal: 35),
+        child: TextFormField(
+          controller: _phoneController,
+          keyboardType: TextInputType.phone,
+          decoration: UICommon.customDecoration(
+              labelText: "Your phone number", prefixIcon: Icons.phone),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your phone number!';
+            } else if (value.length != 10) {
+              return 'Phone number must be 10 digits!';
+            }
+            return null;
+          },
         ),
       ),
     );
@@ -313,22 +322,22 @@ class _SignUpPageState extends State<SignUpPage>
                 return null;
               },
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.image),
-              label: const Text('Choose Avatar Image'),
-              style: ElevatedButton.styleFrom(),
-            ),
-            const SizedBox(height: 20),
-            _avatarImage == null
-                ? const Text('No image selected.')
-                : Image.file(
-                    _avatarImage!,
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  ),
+            // const SizedBox(height: 20),
+            // ElevatedButton.icon(
+            //   onPressed: _pickImage,
+            //   icon: const Icon(Icons.image),
+            //   label: const Text('Choose Avatar Image'),
+            //   style: ElevatedButton.styleFrom(),
+            // ),
+            // const SizedBox(height: 20),
+            // _avatarImage == null
+            //     ? const Text('No image selected.')
+            //     : Image.file(
+            //         _avatarImage!,
+            //         width: 100,
+            //         height: 100,
+            //         fit: BoxFit.cover,
+            //       ),
           ],
         ),
       ),

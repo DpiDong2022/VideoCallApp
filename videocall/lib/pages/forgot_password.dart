@@ -76,13 +76,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
       UICommon.customScaffoldMessager(
           context: context,
           message: 'Code verified successfully.',
-          duration: const Duration(seconds: 1));
+          duration: const Duration(seconds: 2));
       _tabController.animateTo(2); // Move to the next tab
     } else {
       UICommon.customScaffoldMessager(
           context: context,
           message: 'Please enter the verification code.',
-          duration: const Duration(milliseconds: 1500));
+          duration: const Duration(milliseconds: 2000));
     }
   }
 
@@ -96,13 +96,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           UICommon.customScaffoldMessager(
               context: context,
               message: 'Password has been reset.',
-              duration: const Duration(milliseconds: 1000));
+              duration: const Duration(milliseconds: 2000));
           Navigator.pop(context);
         } else {
           UICommon.customScaffoldMessager(
               context: context,
               message: 'Something went wrong! Software is updating...',
-              duration: const Duration(milliseconds: 1500));
+              duration: const Duration(milliseconds: 2000));
         }
       } // Go back to the previous screen
     }
@@ -116,12 +116,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           UICommon.customScaffoldMessager(
               context: context,
               message: 'Your phone number has not been registered yet.',
-              duration: const Duration(milliseconds: 1400));
+              duration: const Duration(milliseconds: 2000));
         } else {
           UICommon.customScaffoldMessager(
               context: context,
               message: 'Verification code sent to your phone.',
-              duration: const Duration(milliseconds: 1400));
+              duration: const Duration(milliseconds: 2000));
           _tabController.animateTo(1); // Move to the next tab
         }
       }
