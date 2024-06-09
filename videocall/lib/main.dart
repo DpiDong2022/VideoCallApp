@@ -1,34 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'data/data_center.dart';
+import 'package:videocall/helpers/shared_preferences_helper.dart';
 import 'pages/first_page.dart';
+import 'pages/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final dataCenter = DataCenter();
-  await dataCenter.loadUsers();
-  runApp(MyApp(dataCenter: dataCenter));
+
+  // Check if userId exists
+  bool isLoggedIn = await checkUserLoggedIn();
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
+}
+
+Future<bool> checkUserLoggedIn() async {
+  // Check for existing userId in SharedPreferences
+  bool hasUserId = await SharedPreferencesHelper.containsKey('userId');
+  return hasUserId;
 }
 
 class MyApp extends StatelessWidget {
-  final DataCenter dataCenter;
+  final bool isLoggedIn;
 
-  MyApp({required this.dataCenter});
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider<DataCenter>.value(value: dataCenter),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Login',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: FirstPage(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Login',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      // Determine the home page based on whether the user is logged in
+      home: isLoggedIn ? const HomePage() : const FirstPage(),
     );
   }
 }

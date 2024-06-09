@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:videocall/database/auth.dart';
+import 'package:videocall/helpers/ui_common.dart';
+import 'package:videocall/pages/forgot_password.dart';
+import 'package:videocall/pages/home_page.dart';
+import 'package:videocall/database/user_db.dart';
+import 'package:videocall/models/user.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -10,23 +16,21 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   bool _isHidePassword = true;
-  ButtonStyle customButtonStyle() {
-    return ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.white),
-        fixedSize: MaterialStateProperty.all(const Size(300, 58)),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(27),
-                side: const BorderSide(color: Colors.white))));
-  }
+  final _formKey = GlobalKey<FormState>(); // Key to manage the form state
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _userDB = UserDB(); // Database helper
+  final _authDB = AuthDB();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/images/bg-begin.png'),
-              fit: BoxFit.cover)),
+        image: DecorationImage(
+          image: AssetImage('assets/images/bg-begin.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
       padding: const EdgeInsets.all(0),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -61,33 +65,104 @@ class _SignInPageState extends State<SignInPage> {
               height: 300,
               color: Colors.transparent,
               padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Your phone number',
-                        prefixIcon: Icon(Icons.phone)),
-                  ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                  TextFormField(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextFormField(
+                      controller: _phoneController,
+                      style: const TextStyle(fontSize: 20, height: 0.8),
+                      keyboardType: TextInputType.number,
+                      decoration: UICommon.customDecoration(
+                          labelText: 'Phone number', prefixIcon: Icons.phone),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your phone number';
+                        }
+                        if (value.length != 10) {
+                          return 'Phone number must be 10 digits long';
+                        }
+                        return null;
+                      },
+                    ),
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+                    TextFormField(
+                      controller: _passwordController,
+                      style: const TextStyle(fontSize: 20, height: 0.8),
                       obscureText: _isHidePassword,
                       decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          hintText: 'Password',
-                          prefixIcon: const Icon(Icons.vpn_key),
-                          suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isHidePassword = !_isHidePassword;
-                                });
-                              },
-                              icon: Icon(_isHidePassword
-                                  ? Icons.visibility_off
-                                  : Icons.remove_red_eye)))),
-                ],
+                        border: const OutlineInputBorder(),
+                        labelText: 'Password',
+                        labelStyle: const TextStyle(color: Colors.black),
+                        errorStyle:
+                            const TextStyle(fontWeight: FontWeight.bold),
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: Colors.black,
+                        ),
+                        suffixIcon: IconButton(
+                          color: Colors.black,
+                          onPressed: () {
+                            setState(() {
+                              _isHidePassword = !_isHidePassword;
+                            });
+                          },
+                          icon: Icon(
+                            _isHidePassword
+                                ? Icons.visibility_off
+                                : Icons.remove_red_eye,
+                          ),
+                        ),
+                        focusedBorder: const UnderlineInputBorder(),
+                        focusedErrorBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2.0,
+                          ),
+                        ),
+                        errorBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(width: 0.6),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        if (value.length < 5) {
+                          return 'Password must be at least 5 characters long';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ForgotPasswordPage()),
+                        );
+                      },
+                      style: ButtonStyle(
+                        foregroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Colors.white;
+                            }
+                            return Colors.black;
+                          },
+                        ),
+                        overlayColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent),
+                      ),
+                      child: const Text(
+                        'Forgot password?',
+                        style: TextStyle(decoration: TextDecoration.underline),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             Expanded(
@@ -97,12 +172,9 @@ class _SignInPageState extends State<SignInPage> {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: () {},
-                        style: customButtonStyle(),
-                        child: const Text(
-                          'Sign in',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
-                        ),
+                        onPressed: _signIn, // Handle sign-in logic
+                        style: UICommon.customButtonStyle(),
+                        child: const Text('Login'),
                       ),
                       const Padding(
                           padding: EdgeInsets.symmetric(vertical: 10)),
@@ -110,12 +182,11 @@ class _SignInPageState extends State<SignInPage> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        style: customButtonStyle(),
+                        style: UICommon.customButtonStyle(),
                         child: const Text(
                           'Back to previous',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -125,5 +196,29 @@ class _SignInPageState extends State<SignInPage> {
         ),
       ),
     );
+  }
+
+  void _signIn() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final phone = _phoneController.text;
+      final password = _passwordController.text;
+
+      final isLoggin = await _authDB.logIn(phone, password);
+      if (mounted) {
+        // Check if the widget is still mounted
+        if (isLoggin) {
+          // Login successful, navigate to home page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        } else {
+          UICommon.customScaffoldMessager(
+              context: context,
+              message: 'Invalid phone number or password!',
+              duration: const Duration(milliseconds: 2000));
+        }
+      }
+    }
   }
 }

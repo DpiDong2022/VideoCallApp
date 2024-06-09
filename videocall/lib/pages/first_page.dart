@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:videocall/helpers/ui_common.dart';
 import './signin_page.dart';
 import './signup_page.dart';
 
 class FirstPage extends StatefulWidget {
+  const FirstPage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _FirstPageState createState() => _FirstPageState();
 }
 
 class _FirstPageState extends State<FirstPage> {
-  ButtonStyle CustomButtonStyle() {
-    return ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.white),
-        fixedSize: MaterialStateProperty.all(Size(300, 58)),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(27),
-                side: BorderSide(color: Colors.white))));
-  }
+  // ignore: non_constant_identifier_names
 
   @override
   Widget build(BuildContext context) {
@@ -25,76 +21,68 @@ class _FirstPageState extends State<FirstPage> {
           image: DecorationImage(
               image: AssetImage('assets/images/bg-begin.png'),
               fit: BoxFit.cover)),
-      padding: EdgeInsets.all(0),
+      padding: const EdgeInsets.all(0),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Container(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              new Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 30),
-                  width: 1000,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Get Started',
+        body: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                width: 1000,
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Get Started',
+                      textAlign: TextAlign.start,
+                      style:
+                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                    ),
+                    Text('Start with sign in or sign up',
                         textAlign: TextAlign.start,
                         style: TextStyle(
-                            fontSize: 40, fontWeight: FontWeight.bold),
-                      ),
-                      Text('Start with sign in or sign up',
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400)),
-                    ],
-                  ),
+                            fontSize: 20, fontWeight: FontWeight.w400)),
+                  ],
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(160),
-              ),
-              new Expanded(
-                child: Container(
-                  color: Colors.transparent,
-                  child: Column(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SignInPage()));
-                        },
-                        child: Text(
-                          'Sign in',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
-                        ),
-                        style: CustomButtonStyle(),
-                      ),
-                      Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SignUpPage()));
-                        },
-                        child: Text(
-                          'Sign up',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
-                        ),
-                        style: CustomButtonStyle(),
-                      )
-                    ],
-                  ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(160),
+            ),
+            Expanded(
+              child: Container(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignInPage()));
+                      },
+                      style: UICommon.customButtonStyle(),
+                      child: const Text('Sign in'),
+                    ),
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpPage()));
+                      },
+                      style: UICommon.customButtonStyle(),
+                      child: const Text('Sign up'),
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
