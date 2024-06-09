@@ -4,7 +4,7 @@ import '../models/user.dart';
 class UserDB {
   // final tableName = 'user';
 
-  Future<int> create({required User user}) async {
+  Future<int?> create({required User user}) async {
     final database = await DatabaseService().database;
     var d = await database.insert(User.tableName, user.toMap());
     return d;
@@ -49,12 +49,5 @@ class UserDB {
     } else {
       return User.fromMap(user.first);
     }
-  }
-
-  Future<bool> changePassword(String phone, String password) async {
-    final db = await DatabaseService().database;
-    var count = await db.rawUpdate(
-        '''UPDATE user SET password = ? WHERE phone = ?;''', [password, phone]);
-    return count == 1 ? true : false;
   }
 }

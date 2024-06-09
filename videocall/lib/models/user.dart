@@ -5,7 +5,7 @@ class User extends BaseModel {
   final String name;
   final String phone;
   final String password;
-  final String image;
+  final String? image;
   final bool isUsing;
 
   User({

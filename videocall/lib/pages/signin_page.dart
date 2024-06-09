@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:videocall/database/auth.dart';
 import 'package:videocall/helpers/ui_common.dart';
 import 'package:videocall/pages/forgot_password.dart';
 import 'package:videocall/pages/home_page.dart';
@@ -19,6 +20,7 @@ class _SignInPageState extends State<SignInPage> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _userDB = UserDB(); // Database helper
+  final _authDB = AuthDB();
 
   @override
   Widget build(BuildContext context) {
@@ -201,11 +203,10 @@ class _SignInPageState extends State<SignInPage> {
       final phone = _phoneController.text;
       final password = _passwordController.text;
 
-      final user = await _userDB.fetchByPhoneAndPassword(phone, password);
-
+      final isLoggin = await _authDB.logIn(phone, password);
       if (mounted) {
         // Check if the widget is still mounted
-        if (user != null) {
+        if (isLoggin) {
           // Login successful, navigate to home page
           Navigator.push(
             context,
@@ -215,7 +216,7 @@ class _SignInPageState extends State<SignInPage> {
           UICommon.customScaffoldMessager(
               context: context,
               message: 'Invalid phone number or password!',
-              duration: const Duration(milliseconds: 600));
+              duration: const Duration(milliseconds: 2000));
         }
       }
     }

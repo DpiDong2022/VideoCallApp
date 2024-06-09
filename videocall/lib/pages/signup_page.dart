@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:videocall/database/user_db.dart';
 import 'package:videocall/helpers/ui_common.dart';
+import 'package:videocall/models/user.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -99,18 +100,33 @@ class _SignUpPageState extends State<SignUpPage>
   }
 
   Future<void> _saveAccount(context) async {
-    if (_nameController.text.isNotEmpty && _avatarImage != null) {
+    if (_nameController.text.isNotEmpty) {
       // Here we would save the user data to SQLite
       // Convert the image to data for storage
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String fileName = basename(_avatarImage!.path);
-      String savedPath = '${appDocDir.path}/$fileName';
+      // Directory appDocDir = await getApplicationDocumentsDirectory();
+      // String fileName = basename(_avatarImage!.path);
+      // String savedPath = '${appDocDir.path}/$fileName';
 
-      await _avatarImage!.copy(savedPath);
-      UICommon.customScaffoldMessager(
-          context: context,
-          message: 'Account created successfully.',
-          duration: const Duration(milliseconds: 2000));
+      // await _avatarImage!.copy(savedPath);
+
+      Future<int?> id = _userDB.create(
+          user: User(
+              name: _nameController.text.trim(),
+              phone: _phoneController.text.trim(),
+              password: _passwordController.text.trim(),
+              image: null,
+              isUsing: false));
+      if (id != null && id != 0) {
+        UICommon.customScaffoldMessager(
+            context: context,
+            message: 'Account created successfully.',
+            duration: const Duration(milliseconds: 2000));
+      } else {
+        UICommon.customScaffoldMessager(
+            context: context,
+            message: 'Something went wrong! Software is updating...',
+            duration: const Duration(milliseconds: 2000));
+      }
 
       // Clear fields or navigate to another screen as needed
     } else {

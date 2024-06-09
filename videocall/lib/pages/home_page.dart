@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:videocall/database/auth.dart';
 import 'package:videocall/database/user_db.dart';
 import 'package:videocall/models/user.dart';
 import 'package:videocall/pages/first_page.dart';
@@ -16,6 +17,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Future<List<User>>? futureUsers;
   final userDB = UserDB();
+  final _auth = AuthDB();
 
   // ignore: non_constant_identifier_names
   ButtonStyle CustomButtonStyle() {
@@ -100,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                                 Text(user.id!.toString()),
                                 Text(user.name),
                                 Text(user.phone),
-                                Text(user.image),
+                                Text(user.image ?? "no have image"),
                                 Text(user.password),
                                 Text(user.isUsing.toString()),
                               ],
@@ -124,6 +126,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     TextButton(
                       onPressed: () {
+                        // _auth.logout();
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -131,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       style: CustomButtonStyle(),
                       child: const Text(
-                        'First page',
+                        'Logout',
                         style: TextStyle(fontSize: 20, color: Colors.black),
                       ),
                     ),

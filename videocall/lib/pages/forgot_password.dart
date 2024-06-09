@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:videocall/database/auth.dart';
 import 'package:videocall/database/user_db.dart';
 import 'package:videocall/helpers/ui_common.dart';
 import 'package:videocall/models/user.dart';
@@ -7,6 +8,7 @@ class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
 }
 
@@ -18,6 +20,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _userDB = UserDB();
+  final _authDB = AuthDB();
 
   // FocusNodes for managing the focus state of the input fields
   final FocusNode _phoneFocusNode = FocusNode();
@@ -89,7 +92,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   void _resetPassword() async {
     if (_formKey.currentState?.validate() ?? false) {
       // Simulate password reset
-      var isSuccessed = await _userDB.changePassword(
+      var isSuccessed = await _authDB.changePassword(
           _phoneController.text.trim(), _passwordController.text.trim());
       if (mounted) {
         if (isSuccessed) {
