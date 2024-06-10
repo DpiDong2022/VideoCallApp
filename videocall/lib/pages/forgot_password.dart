@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:videocall/database/auth.dart';
 import 'package:videocall/database/user_db.dart';
@@ -21,6 +23,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   final _formKey = GlobalKey<FormState>();
   final _userDB = UserDB();
   final _authDB = AuthDB();
+  bool _isHidePassword = true;
 
   // FocusNodes for managing the focus state of the input fields
   final FocusNode _phoneFocusNode = FocusNode();
@@ -242,7 +245,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   Widget _buildNewPasswordTab() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 35),
         child: Column(
           mainAxisSize: MainAxisSize.min, // Centers the Column's content
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -255,10 +258,42 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             TextFormField(
               style: const TextStyle(fontSize: 20, height: 0.8),
               controller: _passwordController,
-              obscureText: true,
+              obscureText: _isHidePassword,
               focusNode: _passwordFocusNode, // Attach the FocusNode
-              decoration: UICommon.customDecoration(
-                  labelText: 'New password', prefixIcon: Icons.lock),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: 'New password',
+                labelStyle: const TextStyle(color: Colors.black),
+                errorStyle: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.red.shade600),
+                prefixIcon: const Icon(
+                  Icons.lock,
+                  color: Colors.black,
+                ),
+                suffixIcon: IconButton(
+                  color: Colors.black,
+                  onPressed: () {
+                    setState(() {
+                      _isHidePassword = !_isHidePassword;
+                    });
+                  },
+                  icon: Icon(
+                    _isHidePassword
+                        ? Icons.visibility_off
+                        : Icons.remove_red_eye,
+                  ),
+                ),
+                focusedBorder: const UnderlineInputBorder(),
+                focusedErrorBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.red,
+                    width: 2.0,
+                  ),
+                ),
+                errorBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(width: 0.6),
+                ),
+              ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your new password';
