@@ -21,7 +21,8 @@ class UICommon {
       errorBorder: const OutlineInputBorder(
         borderSide: BorderSide(width: 0.6),
       ),
-      errorStyle: const TextStyle(fontWeight: FontWeight.bold),
+      errorStyle:
+          TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade600),
     );
   }
 

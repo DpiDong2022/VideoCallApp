@@ -27,6 +27,7 @@ class _SignUpPageState extends State<SignUpPage>
   final _nameController = TextEditingController();
   final _userDB = UserDB();
   File? _avatarImage;
+  bool _isHidePassword = true;
 
   @override
   void initState() {
@@ -263,7 +264,7 @@ class _SignUpPageState extends State<SignUpPage>
   Widget _buildVerificationCodeTab() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 35),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -289,15 +290,47 @@ class _SignUpPageState extends State<SignUpPage>
   Widget _buildPasswordTab() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 35),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextFormField(
               controller: _passwordController,
-              obscureText: true,
-              decoration: UICommon.customDecoration(
-                  labelText: "New password", prefixIcon: Icons.lock),
+              obscureText: _isHidePassword,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: 'Password',
+                labelStyle: const TextStyle(color: Colors.black),
+                errorStyle: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.red.shade600),
+                prefixIcon: const Icon(
+                  Icons.lock,
+                  color: Colors.black,
+                ),
+                suffixIcon: IconButton(
+                  color: Colors.black,
+                  onPressed: () {
+                    setState(() {
+                      _isHidePassword = !_isHidePassword;
+                    });
+                  },
+                  icon: Icon(
+                    _isHidePassword
+                        ? Icons.visibility_off
+                        : Icons.remove_red_eye,
+                  ),
+                ),
+                focusedBorder: const UnderlineInputBorder(),
+                focusedErrorBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.red,
+                    width: 2.0,
+                  ),
+                ),
+                errorBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(width: 0.6),
+                ),
+              ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter a new password';
@@ -317,7 +350,7 @@ class _SignUpPageState extends State<SignUpPage>
   Widget _buildAccountDetailsTab() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 35),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
