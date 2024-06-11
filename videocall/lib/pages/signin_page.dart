@@ -95,8 +95,9 @@ class _SignInPageState extends State<SignInPage> {
                         border: const OutlineInputBorder(),
                         labelText: 'Password',
                         labelStyle: const TextStyle(color: Colors.black),
-                        errorStyle:
-                            const TextStyle(fontWeight: FontWeight.bold),
+                        errorStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red.shade600),
                         prefixIcon: const Icon(
                           Icons.lock,
                           color: Colors.black,

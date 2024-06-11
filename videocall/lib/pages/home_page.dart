@@ -1,151 +1,86 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:videocall/database/auth.dart';
-import 'package:videocall/database/user_db.dart';
-import 'package:videocall/models/user.dart';
-import 'package:videocall/pages/first_page.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _HomePageState createState() => _HomePageState();
+void main() {
+  runApp(const MyApp());
 }
 
-class _HomePageState extends State<HomePage> {
-  Future<List<User>>? futureUsers;
-  final userDB = UserDB();
-  final _auth = AuthDB();
-
-  // ignore: non_constant_identifier_names
-  ButtonStyle CustomButtonStyle() {
-    return ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.white),
-        fixedSize: MaterialStateProperty.all(const Size(300, 58)),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(27),
-                side: const BorderSide(color: Colors.white))));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      userDB.create(
-          user: User(
-              name: "phung dai dong",
-              phone: "0368728267",
-              password: "123",
-              image: "dong.png",
-              isUsing: true));
-      futureUsers = userDB.fetchAll();
-    });
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/images/bg-begin.png'),
-              fit: BoxFit.cover)),
-      padding: const EdgeInsets.all(0),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                width: 1000,
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Home',
-                      textAlign: TextAlign.start,
-                      style:
-                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-                    ),
-                    Text('Start with sign in or sign up',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w400)),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(160),
-            ),
-            Expanded(
-              child: FutureBuilder<List<User>>(
-                future: futureUsers,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    final users = snapshot.data!;
-                    if (users.isNotEmpty) {
-                      return ListView.separated(
-                          itemBuilder: (context, index) {
-                            final user = users[index];
-                            return Column(
-                              children: [
-                                Text(user.id!.toString()),
-                                Text(user.name),
-                                Text(user.phone),
-                                Text(user.image ?? "no have image"),
-                                Text(user.password),
-                                Text(user.isUsing.toString()),
-                              ],
-                            );
-                          },
-                          separatorBuilder: (context, index) {
-                            return const SizedBox(height: 12);
-                          },
-                          itemCount: users.length);
-                    } else {
-                      return const Text('hello');
-                    }
-                  }
-                },
-              ),
-            ),
-            Expanded(
-              child: Container(
-                color: Colors.transparent,
-                child: Column(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        // _auth.logout();
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const FirstPage()));
-                      },
-                      style: CustomButtonStyle(),
-                      child: const Text(
-                        'Logout',
-                        style: TextStyle(fontSize: 20, color: Colors.black),
-                      ),
-                    ),
-                    const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'AppBar',
+      theme: ThemeData(
+        primarySwatch: Colors.amber,
+      ),
+      home: const HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: VideoCallAppBar(
+        title: 'Appbar',
+        onSearchTap: () {},
+        onAddFriendTap: () {},
+        onSettingsTap: () {},
       ),
     );
   }
+}
+
+class VideoCallAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final VoidCallback onSearchTap;
+  final VoidCallback onAddFriendTap;
+  final VoidCallback onSettingsTap;
+
+  const VideoCallAppBar({
+    super.key,
+    required this.title,
+    required this.onSearchTap,
+    required this.onAddFriendTap,
+    required this.onSettingsTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.blue,
+      elevation: 4.0, // Shadow effect
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w100,
+        ),
+      ),
+      centerTitle: false,
+      leading: IconButton(
+        icon: const Icon(Icons.search, color: Colors.white),
+        onPressed: () {},
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.group_add_outlined, color: Colors.white),
+          onPressed: onSearchTap,
+        ),
+        IconButton(
+          icon:
+              const Icon(Icons.settings_suggest_outlined, color: Colors.white),
+          onPressed: onSearchTap,
+        )
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
