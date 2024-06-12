@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:videocall/helpers/ui_common.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,78 +11,98 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'AppBar',
-      theme: ThemeData(
-        primarySwatch: Colors.amber,
-      ),
-      home: const HomePage(),
+      home: HomePage(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: VideoCallAppBar(
-        title: 'Appbar',
-        onSearchTap: () {},
-        onAddFriendTap: () {},
-        onSettingsTap: () {},
-      ),
-    );
-  }
+  // ignore: library_private_types_in_public_api
+  _HomePageState createState() => _HomePageState();
 }
 
-class VideoCallAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final VoidCallback onSearchTap;
-  final VoidCallback onAddFriendTap;
-  final VoidCallback onSettingsTap;
-
-  const VideoCallAppBar({
-    super.key,
-    required this.title,
-    required this.onSearchTap,
-    required this.onAddFriendTap,
-    required this.onSettingsTap,
-  });
-
+class _HomePageState extends State<HomePage> {
+  var _bottomItemIndex = 0;
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: _appBar(),
+        body: _body(),
+        bottomNavigationBar: _bottomNavigation());
+  }
+
+  AppBar _appBar() {
     return AppBar(
-      backgroundColor: Colors.blue,
-      elevation: 4.0, // Shadow effect
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w100,
-        ),
+      backgroundColor: Colors.blue[700],
+      title: TextFormField(
+        cursorColor: const Color.fromARGB(255, 17, 172, 255),
+        cursorHeight: 25,
+        cursorRadius: const Radius.circular(50),
+        mouseCursor: MouseCursor.defer,
+        style: const TextStyle(color: Colors.black),
+        decoration: const InputDecoration(
+            focusColor: Colors.black,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(borderSide: BorderSide.none),
+            prefixIcon: Icon(
+              Icons.search,
+              color: Colors.blue,
+            ),
+            hintText: "Search...",
+            hintStyle:
+                TextStyle(color: Colors.blue, fontWeight: FontWeight.normal),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            suffixIcon: Icon(Icons.close)),
+        onChanged: (value) {},
       ),
-      centerTitle: false,
-      leading: IconButton(
-        icon: const Icon(Icons.search, color: Colors.white),
-        onPressed: () {},
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.group_add_outlined, color: Colors.white),
-          onPressed: onSearchTap,
+      titleTextStyle: const TextStyle(color: Colors.white),
+    );
+  }
+
+  BottomNavigationBar _bottomNavigation() {
+    return BottomNavigationBar(
+      backgroundColor: Colors.blue[700],
+      currentIndex: _bottomItemIndex,
+      unselectedItemColor: Colors.white60,
+      selectedItemColor: Colors.white,
+      showUnselectedLabels: false,
+      onTap: (index) {
+        setState(() {
+          _bottomItemIndex = index;
+        });
+      },
+      items: const [
+        BottomNavigationBarItem(
+            icon: Icon(
+              Icons.group_add,
+            ),
+            label: "Add"),
+        BottomNavigationBarItem(
+          icon: Icon(
+            Icons.person_outline_sharp,
+          ),
+          label: "Me",
         ),
-        IconButton(
-          icon:
-              const Icon(Icons.settings_suggest_outlined, color: Colors.white),
-          onPressed: onSearchTap,
-        )
+        BottomNavigationBarItem(
+            icon: Icon(
+              Icons.person_outline_sharp,
+            ),
+            label: "Me"),
       ],
     );
   }
 
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  SafeArea _body() {
+    return const SafeArea(
+      child: Center(
+        child: Text('Welcome to the Video Call App!'),
+      ),
+    );
+  }
 }
