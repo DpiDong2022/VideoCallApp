@@ -64,4 +64,26 @@ class UICommon {
                         ? Colors.white
                         : boderSideColor))));
   }
+
+  static Container circularProgress({Color? valueColor}) {
+    return Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.only(top: 10),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor:
+                AlwaysStoppedAnimation(valueColor ?? Colors.blue.shade700),
+          ),
+        ));
+  }
+
+  static Container linearProgress({Color? valueColor}) {
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.only(bottom: 10),
+      child: LinearProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(valueColor ?? Colors.blue.shade700),
+      ),
+    );
+  }
 }

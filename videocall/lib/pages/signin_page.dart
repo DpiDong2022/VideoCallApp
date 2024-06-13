@@ -209,10 +209,10 @@ class _SignInPageState extends State<SignInPage> {
         // Check if the widget is still mounted
         if (isLoggin) {
           // Login successful, navigate to home page
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (route) => false);
         } else {
           UICommon.customScaffoldMessager(
               context: context,
