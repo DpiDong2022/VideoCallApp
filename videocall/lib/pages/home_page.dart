@@ -244,6 +244,7 @@ class _HomePageState extends State<HomePage> {
   SafeArea _body() {
     return SafeArea(
         child: PageView(
+      physics: const NeverScrollableScrollPhysics(),
       controller: _pageController,
       children: const [
         // Content for the "Call" tab
