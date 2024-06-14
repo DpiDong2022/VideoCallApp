@@ -6,6 +6,7 @@ import 'package:videocall/helpers/shared_preferences_helper.dart';
 import 'package:videocall/models/user.dart';
 import 'package:videocall/pages/first_page.dart';
 import 'package:videocall/pages/personal_page.dart';
+import 'package:videocall/pages/security.dart';
 
 void main() {
   runApp(const MyApp());
@@ -131,7 +132,7 @@ class _HomePageState extends State<HomePage> {
       onSelected: (value) {
         // Handle menu item selection
         switch (value) {
-          case 'Edit Personal Information':
+          case 'Personal Information':
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const PersonalPage()));
             break;
@@ -147,9 +148,9 @@ class _HomePageState extends State<HomePage> {
               });
             });
             break;
-          case 'Password':
-            Common.customScaffoldMessager(
-                message: 'Password', context: context);
+          case 'Security':
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const SecurityPage()));
             break;
         }
       },
@@ -157,12 +158,12 @@ class _HomePageState extends State<HomePage> {
         // PopupMenuItem(
         //     child: IconButton(onPressed: () {}, icon: const Icon(Icons.close))),
         const PopupMenuItem(
-          value: 'Edit Personal Information',
+          value: 'Personal Information',
           child: Row(
             children: [
               Icon(Icons.edit, color: Colors.blue),
               SizedBox(width: 8),
-              Text('Edit Personal Information'),
+              Text('Personal Information'),
             ],
           ),
         ),
@@ -170,12 +171,12 @@ class _HomePageState extends State<HomePage> {
           height: 0,
         ),
         const PopupMenuItem(
-          value: 'Password',
+          value: 'Security',
           child: Row(
             children: [
-              Icon(Icons.lock, color: Colors.blue),
+              Icon(Icons.privacy_tip_outlined, color: Colors.blue),
               SizedBox(width: 8),
-              Text('Password'),
+              Text('Security'),
             ],
           ),
         ),
