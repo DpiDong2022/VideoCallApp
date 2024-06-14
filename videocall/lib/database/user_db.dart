@@ -10,6 +10,13 @@ class UserDB {
     return d;
   }
 
+  Future<bool> update({required User user}) async {
+    final database = await DatabaseService().database;
+    var d = await database.update(User.tableName, user.toMap(),
+        where: "id = ?", whereArgs: [user.id]);
+    return d > 0;
+  }
+
   Future<List<User>> fetchAll() async {
     final database = await DatabaseService().database;
     final users = await database.rawQuery('''SELECT * FROM user;''');
@@ -42,6 +49,7 @@ class UserDB {
 
   Future<User?> fetchByPhone(String phone) async {
     final db = await DatabaseService().database;
+    await db.execute('PRAGMA cache_size = 10000000'); // Set to 10MB
     var user =
         await db.rawQuery('''SELECT * FROM user WHERE phone = ?;''', [phone]);
     if (user.isEmpty) {
