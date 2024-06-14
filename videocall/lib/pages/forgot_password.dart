@@ -1,10 +1,7 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:videocall/database/auth.dart';
 import 'package:videocall/database/user_db.dart';
 import 'package:videocall/helpers/common.dart';
-import 'package:videocall/models/user.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});

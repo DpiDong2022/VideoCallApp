@@ -4,7 +4,6 @@ import 'package:videocall/helpers/common.dart';
 import 'package:videocall/pages/forgot_password.dart';
 import 'package:videocall/pages/home_page.dart';
 import 'package:videocall/database/user_db.dart';
-import 'package:videocall/models/user.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});

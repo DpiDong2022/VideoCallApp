@@ -1,11 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:videocall/database/user_db.dart';
-import 'package:videocall/helpers/shared_preferences_helper.dart';
-import 'dart:io';
-
-import 'package:videocall/helpers/common.dart';
-import 'package:videocall/models/user.dart';
 
 void main() {
   runApp(const MyApp());

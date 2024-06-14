@@ -17,8 +17,6 @@ class User extends BaseModel {
     required this.isUsing,
   });
 
-  // Convert a User object into a Map. The keys must correspond to the column names in the database.
-
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       id: map['id'],
@@ -26,7 +24,7 @@ class User extends BaseModel {
       phone: map['phone'],
       password: map['password'],
       image: map['image'],
-      isUsing: map['is_using'] == 1, // Convert int to bool
+      isUsing: map['is_using'] == 1,
     );
   }
 

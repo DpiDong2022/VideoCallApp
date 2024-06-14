@@ -17,9 +17,12 @@ class UserDB {
     return d > 0;
   }
 
-  Future<List<User>> fetchAll() async {
+  Future<List<User>> fetchAll({String? phoneNumber}) async {
     final database = await DatabaseService().database;
-    final users = await database.rawQuery('''SELECT * FROM user;''');
+    final users = phoneNumber == null || phoneNumber.isEmpty
+        ? await database.rawQuery('''SELECT * FROM user;''')
+        : await database
+            .rawQuery('''SELECT * FROM user WHERE phone = ?;''', [phoneNumber]);
     return users.map((user) => User.fromMap(user)).toList();
   }
 

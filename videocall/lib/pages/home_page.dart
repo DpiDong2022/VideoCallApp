@@ -7,6 +7,7 @@ import 'package:videocall/models/user.dart';
 import 'package:videocall/pages/first_page.dart';
 import 'package:videocall/pages/personal_page.dart';
 import 'package:videocall/pages/security.dart';
+import 'package:videocall/pages/user_card.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,19 +41,41 @@ class _HomePageState extends State<HomePage> {
   final AuthDB _authDB = AuthDB();
   final _userDB = UserDB();
   User? _currentUser;
-  MemoryImage? _currentUserImage; // Updated to nullable
+  MemoryImage? _currentUserImage;
+  List<User>? users = [];
 
   @override
   void initState() {
     super.initState();
-    _searchInputController.addListener(() {
-      setState(() {});
-    });
+    _searchInputController.addListener(_onSearchInputChanged);
     initInfor(); // Call the initialization function here
+  }
+
+  void _onSearchInputChanged() {
+    if (_searchInputController.text.isEmpty) {
+      // If the search input is empty, reset the users list or fetch default users
+      setState(() {
+        users = []; // or you can reset to a default set of users
+      });
+    } else {
+      // If there's text in the search input, perform the search
+      _search();
+    }
+  }
+
+  void _search() {
+    _userDB
+        .fetchAll(phoneNumber: _searchInputController.text.trim())
+        .then((value) {
+      setState(() {
+        users = value;
+      });
+    });
   }
 
   @override
   void dispose() {
+    _searchInputController.removeListener(_onSearchInputChanged);
     _searchInputController.dispose();
     _pageController.dispose();
     super.dispose();
@@ -104,13 +127,15 @@ class _HomePageState extends State<HomePage> {
                             icon: const Icon(Icons.close,
                                 color: Color.fromARGB(255, 0, 0, 0), size: 22),
                             onPressed: () {
-                              _searchInputController
-                                  .clear(); // Clear the text in the field
-                              setState(() {});
+                              _searchInputController.clear();
+                              _search(); // Perform search after clearing to reset the list
                             },
                           )
                         : null),
                 onChanged: (value) => {setState(() {})},
+                onEditingComplete: () {
+                  _search();
+                },
               ),
             ),
             const SizedBox(width: 17),
@@ -155,8 +180,6 @@ class _HomePageState extends State<HomePage> {
         }
       },
       itemBuilder: (BuildContext context) => [
-        // PopupMenuItem(
-        //     child: IconButton(onPressed: () {}, icon: const Icon(Icons.close))),
         const PopupMenuItem(
           value: 'Personal Information',
           child: Row(
@@ -244,15 +267,24 @@ class _HomePageState extends State<HomePage> {
   SafeArea _body() {
     return SafeArea(
         child: PageView(
+      physics: const NeverScrollableScrollPhysics(),
       controller: _pageController,
-      children: const [
+      children: [
         // Content for the "Call" tab
-        Center(
+        const Center(
           child: Text('Call Tab'),
         ),
         // Content for the "Add friend" tab
         Center(
-          child: Text('Add Friend Tab'),
+          child: users!.isEmpty
+              ? const Center(child: Text('No users found'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(0),
+                  itemCount: users!.length,
+                  itemBuilder: (context, index) {
+                    return UserCard(user: users![index]);
+                  },
+                ),
         ),
       ],
     ));
