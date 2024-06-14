@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:videocall/database/auth.dart';
 import 'package:videocall/database/friend_ship_db.dart';
 import 'package:videocall/database/user_db.dart';
@@ -56,22 +57,37 @@ class _HomePageState extends State<HomePage> {
     initInfor();
   }
 
-  void _onSearchInputChanged() {
+  void _onSearchInputChanged() async {
     if (_searchInputController.text.isEmpty) {
       // If the search input is empty, reset the users list or fetch default users
       setState(() {
         users = []; // or you can reset to a default set of users
       });
+
+      setState(() async {
+        allUsers = await _friendDB.fetchFriendsOfUser(
+            await SharedPreferencesHelper.getInt('userId') ?? 0, " ");
+      });
     } else {
       // If there's text in the search input, perform the search
       _search();
+      udpateFriends();
     }
+  }
+
+  void udpateFriends() async {
+    setState(() async {
+      allUsers = await _friendDB.fetchFriendsOfUser(
+          await SharedPreferencesHelper.getInt('userId') ?? 0,
+          _searchInputController.text.trim());
+    });
   }
 
   void _onInit() async {
     setState(() async {
       allUsers = await _friendDB.fetchFriendsOfUser(
-          await SharedPreferencesHelper.getInt('userId') ?? 0);
+          await SharedPreferencesHelper.getInt('userId') ?? 0,
+          _searchInputController.text.trim());
     });
   }
 
@@ -145,13 +161,20 @@ class _HomePageState extends State<HomePage> {
                                 color: Color.fromARGB(255, 0, 0, 0), size: 22),
                             onPressed: () {
                               _searchInputController.clear();
-                              _search(); // Perform search after clearing to reset the list
+                              setState(() {
+                                _search();
+                                _onSearchInputChanged();
+                              });
                             },
                           )
                         : null),
-                onChanged: (value) => {setState(() {})},
+                onChanged: (value) => {
+                  setState(() {
+                    _onSearchInputChanged();
+                  })
+                },
                 onEditingComplete: () {
-                  _search();
+                  _onSearchInputChanged();
                 },
                 onFieldSubmitted: (value) => _searchFocusNode.unfocus(),
               ),
@@ -321,7 +344,9 @@ class _HomePageState extends State<HomePage> {
       _isLoading = true;
     });
 
-    allUsers = await _userDB.fetchAll();
+    allUsers = await _friendDB.fetchFriendsOfUser(
+        await SharedPreferencesHelper.getInt('userId') ?? 0,
+        _searchInputController.text.trim());
 
     try {
       final userId = await SharedPreferencesHelper.getInt('userId');

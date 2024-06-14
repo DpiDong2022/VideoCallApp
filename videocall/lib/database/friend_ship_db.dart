@@ -49,7 +49,7 @@ class FriendShipDB {
     );
   }
 
-  Future<List<User>> fetchFriendsOfUser(int userId) async {
+  Future<List<User>> fetchFriendsOfUser(int userId, String key) async {
     final database = await DatabaseService().database;
     final friends = await database.rawQuery(
       '''with ids as (SELECT CASE
@@ -59,8 +59,8 @@ class FriendShipDB {
         from friend_ship
         where user1_id = ? OR user2_id = ?)
         select u.id, name, phone, password, image, is_using from ids, user as u
-        where u.id = ids.id''',
-      [userId, userId, userId, userId],
+        where u.id = ids.id AND u.name LIKE ?''',
+      [userId, userId, userId, userId, '%$key%'],
     );
     return friends.map((map) => User.fromMap(map)).toList();
   }
