@@ -1,12 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:videocall/database/auth.dart';
-import 'package:videocall/helpers/ui_common.dart';
+import 'package:videocall/database/user_db.dart';
+import 'package:videocall/helpers/common.dart';
+import 'package:videocall/helpers/shared_preferences_helper.dart';
+import 'package:videocall/models/user.dart';
 import 'package:videocall/pages/first_page.dart';
 import 'package:videocall/pages/personal_page.dart';
-import 'package:videocall/pages/signin_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,9 +33,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var _bottomItemIndex = 0;
+  bool _isLoading = false;
   final TextEditingController _searchInputController = TextEditingController();
   final PageController _pageController = PageController();
   final AuthDB _authDB = AuthDB();
+  final _userDB = UserDB();
+  User? _currentUser;
+  MemoryImage? _currentUserImage; // Updated to nullable
 
   @override
   void initState() {
@@ -44,6 +47,7 @@ class _HomePageState extends State<HomePage> {
     _searchInputController.addListener(() {
       setState(() {});
     });
+    initInfor(); // Call the initialization function here
   }
 
   @override
@@ -55,10 +59,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: _appBar(),
-        body: _body(),
-        bottomNavigationBar: _bottomNavigation());
+    return Stack(
+      children: [
+        Scaffold(
+            appBar: _appBar(),
+            body: _body(),
+            bottomNavigationBar: _bottomNavigation()),
+        if (_isLoading) Common.circularProgress() // Loading indicator
+      ],
+    );
   }
 
   AppBar _appBar() {
@@ -127,14 +136,19 @@ class _HomePageState extends State<HomePage> {
                 MaterialPageRoute(builder: (context) => const PersonalPage()));
             break;
           case 'Logout':
-            _authDB.logout();
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const FirstPage()),
-                (route) => false);
+            setState(() {
+              _isLoading = true;
+              _authDB.logout(fakeDelayMiniSecond: 500).then((value) {
+                _isLoading = false;
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const FirstPage()),
+                    (route) => false);
+              });
+            });
             break;
           case 'Password':
-            UICommon.customScaffoldMessager(
+            Common.customScaffoldMessager(
                 message: 'Password', context: context);
             break;
         }
@@ -179,12 +193,15 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ],
-      child: const CircleAvatar(
+      child: CircleAvatar(
         backgroundColor: Colors.white,
         radius: 20, // Adjust the size if necessary
         child: ClipOval(
           child: Image(
-            image: AssetImage('assets/images/default_avatar.jpg'),
+            image: _currentUserImage != null
+                ? _currentUserImage!
+                : const AssetImage('assets/images/default_avatar.jpg')
+                    as ImageProvider,
             fit: BoxFit.cover,
             width: 100, // Adjust the size if necessary
             height: 100, // Adjust the size if necessary
@@ -238,5 +255,35 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     ));
+  }
+
+  Future<void> initInfor() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final userId = await SharedPreferencesHelper.getInt('userId');
+      if (userId != null) {
+        final userInfor = await _userDB.fetchById(userId);
+        setState(() {
+          _currentUser = userInfor;
+        });
+
+        if (userInfor.image != null && userInfor.image!.length > 0) {
+          final userImage = await Common.blobToImageWidget(userInfor.image!);
+          setState(() {
+            _currentUserImage = userImage as MemoryImage?;
+          });
+        }
+      }
+    } catch (e) {
+      // Handle any errors
+      print('Error loading user information: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }

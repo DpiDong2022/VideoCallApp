@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:videocall/helpers/ui_common.dart';
+import 'package:videocall/helpers/common.dart';
 import './signin_page.dart';
 import './signup_page.dart';
 
@@ -64,7 +64,7 @@ class _FirstPageState extends State<FirstPage> {
                             MaterialPageRoute(
                                 builder: (context) => const SignInPage()));
                       },
-                      style: UICommon.customButtonStyle(),
+                      style: Common.customButtonStyle(),
                       child: const Text('Sign in'),
                     ),
                     const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
@@ -75,7 +75,7 @@ class _FirstPageState extends State<FirstPage> {
                             MaterialPageRoute(
                                 builder: (context) => const SignUpPage()));
                       },
-                      style: UICommon.customButtonStyle(),
+                      style: Common.customButtonStyle(),
                       child: const Text('Sign up'),
                     )
                   ],

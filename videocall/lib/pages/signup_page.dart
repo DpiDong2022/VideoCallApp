@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:videocall/database/user_db.dart';
-import 'package:videocall/helpers/ui_common.dart';
+import 'package:videocall/helpers/common.dart';
 import 'package:videocall/models/user.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -53,12 +53,12 @@ class _SignUpPageState extends State<SignUpPage>
       var user = await _userDB.fetchByPhone(_phoneController.text.trim());
       if (mounted) {
         if (user != null) {
-          UICommon.customScaffoldMessager(
+          Common.customScaffoldMessager(
               context: context,
               message: 'Your phone number has been registered!',
               duration: const Duration(milliseconds: 2000));
         } else {
-          UICommon.customScaffoldMessager(
+          Common.customScaffoldMessager(
               context: context,
               message: 'Verification code sent to your phone.',
               duration: const Duration(milliseconds: 2000));
@@ -70,13 +70,13 @@ class _SignUpPageState extends State<SignUpPage>
 
   void _verifyCode(context) {
     if (_codeController.text.isNotEmpty) {
-      UICommon.customScaffoldMessager(
+      Common.customScaffoldMessager(
           context: context,
           message: 'Code verified successfully.',
           duration: const Duration(milliseconds: 2000));
       _tabController.animateTo(2);
     } else {
-      UICommon.customScaffoldMessager(
+      Common.customScaffoldMessager(
           context: context,
           message: 'Please enter the verification code!',
           duration: const Duration(milliseconds: 2000));
@@ -85,7 +85,7 @@ class _SignUpPageState extends State<SignUpPage>
 
   void _resetPassword(context) {
     if (_formKey.currentState?.validate() ?? false) {
-      UICommon.customScaffoldMessager(
+      Common.customScaffoldMessager(
           context: context,
           message: 'Password set successfully.',
           duration: const Duration(milliseconds: 2000));
@@ -118,12 +118,12 @@ class _SignUpPageState extends State<SignUpPage>
               image: null,
               isUsing: false));
       if (id != null && id != 0) {
-        UICommon.customScaffoldMessager(
+        Common.customScaffoldMessager(
             context: context,
             message: 'Account created successfully.',
             duration: const Duration(milliseconds: 2000));
       } else {
-        UICommon.customScaffoldMessager(
+        Common.customScaffoldMessager(
             context: context,
             message: 'Something went wrong! Software is updating...',
             duration: const Duration(milliseconds: 2000));
@@ -131,7 +131,7 @@ class _SignUpPageState extends State<SignUpPage>
 
       // Clear fields or navigate to another screen as needed
     } else {
-      UICommon.customScaffoldMessager(
+      Common.customScaffoldMessager(
           context: context,
           message: 'Please provide all details and avatar image!',
           duration: const Duration(milliseconds: 2000));
@@ -227,7 +227,7 @@ class _SignUpPageState extends State<SignUpPage>
                         _saveAccount(context);
                       }
                     },
-                    style: UICommon.customButtonStyle(),
+                    style: Common.customButtonStyle(),
                     child: Text(_tabController.index != 3 ? "Next" : "Finish"),
                   ),
                 ],
@@ -246,7 +246,7 @@ class _SignUpPageState extends State<SignUpPage>
         child: TextFormField(
           controller: _phoneController,
           keyboardType: TextInputType.phone,
-          decoration: UICommon.customDecoration(
+          decoration: Common.customDecoration(
               labelText: "Your phone number", prefixIcon: Icons.phone),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -271,7 +271,7 @@ class _SignUpPageState extends State<SignUpPage>
             TextFormField(
               controller: _codeController,
               keyboardType: TextInputType.number,
-              decoration: UICommon.customDecoration(
+              decoration: Common.customDecoration(
                   labelText: "Verification Code",
                   prefixIcon: Icons.verified_user),
               validator: (value) {

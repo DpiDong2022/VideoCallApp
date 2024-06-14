@@ -1,6 +1,5 @@
 import 'package:videocall/database/user_db.dart';
 import 'package:videocall/helpers/shared_preferences_helper.dart';
-import 'package:videocall/models/user.dart';
 
 import 'database_service.dart';
 
@@ -13,7 +12,9 @@ class AuthDB {
     return count == 1 ? true : false;
   }
 
-  Future<bool> logIn(String phone, String password) async {
+  Future<bool> logIn(
+      String phone, String password, int? fakeDelayMiniSecond) async {
+    await Future.delayed(Duration(milliseconds: fakeDelayMiniSecond ?? 0));
     var user = await _userDB.fetchByPhoneAndPassword(phone, password);
     if (user != null) {
       await SharedPreferencesHelper.saveInt('userId', user.id!);
@@ -23,7 +24,8 @@ class AuthDB {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout({int? fakeDelayMiniSecond}) async {
+    await Future.delayed(Duration(milliseconds: fakeDelayMiniSecond ?? 0));
     await SharedPreferencesHelper.remove('userId');
   }
 }

@@ -1,12 +1,12 @@
 import 'package:videocall/models/base_model.dart';
 
 class User extends BaseModel {
-  final int? id;
-  final String name;
-  final String phone;
-  final String password;
-  final String? image;
-  final bool isUsing;
+  int? id;
+  String name;
+  String phone;
+  String password;
+  String? image;
+  bool isUsing;
 
   User({
     this.id,
@@ -40,6 +40,24 @@ class User extends BaseModel {
       'image': image,
       'is_using': isUsing ? 1 : 0,
     };
+  }
+
+  User copyWith({
+    int? id,
+    String? name,
+    String? phone,
+    String? password,
+    String? image,
+    bool? isUsing,
+  }) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      password: password ?? this.password,
+      image: image ?? this.image,
+      isUsing: isUsing ?? this.isUsing,
+    );
   }
 
   static String tableName = 'user';

@@ -3,7 +3,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:videocall/database/auth.dart';
 import 'package:videocall/database/user_db.dart';
-import 'package:videocall/helpers/ui_common.dart';
+import 'package:videocall/helpers/common.dart';
 import 'package:videocall/models/user.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -79,13 +79,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   void _verifyCode() {
     // Simulate code verification
     if (_codeController.text.isNotEmpty) {
-      UICommon.customScaffoldMessager(
+      Common.customScaffoldMessager(
           context: context,
           message: 'Code verified successfully.',
           duration: const Duration(seconds: 2));
       _tabController.animateTo(2); // Move to the next tab
     } else {
-      UICommon.customScaffoldMessager(
+      Common.customScaffoldMessager(
           context: context,
           message: 'Please enter the verification code.',
           duration: const Duration(milliseconds: 2000));
@@ -99,13 +99,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
           _phoneController.text.trim(), _passwordController.text.trim());
       if (mounted) {
         if (isSuccessed) {
-          UICommon.customScaffoldMessager(
+          Common.customScaffoldMessager(
               context: context,
               message: 'Password has been reset.',
               duration: const Duration(milliseconds: 2000));
           Navigator.pop(context);
         } else {
-          UICommon.customScaffoldMessager(
+          Common.customScaffoldMessager(
               context: context,
               message: 'Something went wrong! Software is updating...',
               duration: const Duration(milliseconds: 2000));
@@ -119,12 +119,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
       var user = await _userDB.fetchByPhone(_phoneController.text.trim());
       if (mounted) {
         if (user == null) {
-          UICommon.customScaffoldMessager(
+          Common.customScaffoldMessager(
               context: context,
               message: 'Your phone number has not been registered yet.',
               duration: const Duration(milliseconds: 2000));
         } else {
-          UICommon.customScaffoldMessager(
+          Common.customScaffoldMessager(
               context: context,
               message: 'Verification code sent to your phone.',
               duration: const Duration(milliseconds: 2000));
@@ -174,7 +174,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
               keyboardType: TextInputType.phone,
               style: const TextStyle(fontSize: 20, height: 0.8),
               focusNode: _phoneFocusNode, // Attach the FocusNode
-              decoration: UICommon.customDecoration(
+              decoration: Common.customDecoration(
                   labelText: 'Phone number', prefixIcon: Icons.phone),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -189,7 +189,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
             TextButton(
               onPressed: _validatePhoneNumber, // Handle sign-in logic
-              style: UICommon.customButtonStyle(boderSideColor: Colors.black),
+              style: Common.customButtonStyle(boderSideColor: Colors.black),
               child: const Text(
                 'Send code',
               ),
@@ -218,7 +218,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
               style: const TextStyle(fontSize: 20, height: 0.8),
               keyboardType: TextInputType.number,
               focusNode: _codeFocusNode, // Attach the FocusNode
-              decoration: UICommon.customDecoration(
+              decoration: Common.customDecoration(
                   labelText: 'Verification Code',
                   prefixIcon: Icons.verified_user),
               validator: (value) {
@@ -231,7 +231,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             const SizedBox(height: 20),
             TextButton(
               onPressed: _verifyCode, // Handle sign-in logic
-              style: UICommon.customButtonStyle(boderSideColor: Colors.black),
+              style: Common.customButtonStyle(boderSideColor: Colors.black),
               child: const Text(
                 'Verify Code',
               ),
@@ -307,7 +307,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
             const SizedBox(height: 20),
             TextButton(
               onPressed: _resetPassword, // Handle sign-in logic
-              style: UICommon.customButtonStyle(boderSideColor: Colors.black),
+              style: Common.customButtonStyle(boderSideColor: Colors.black),
               child: const Text(
                 'Reset Password',
               ),
