@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:videocall/database/auth.dart';
+import 'package:videocall/database/friend_ship_db.dart';
 import 'package:videocall/database/user_db.dart';
 import 'package:videocall/helpers/common.dart';
 import 'package:videocall/helpers/shared_preferences_helper.dart';
@@ -38,17 +39,21 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   final TextEditingController _searchInputController = TextEditingController();
   final PageController _pageController = PageController();
+  final FocusNode _searchFocusNode = FocusNode();
   final AuthDB _authDB = AuthDB();
   final _userDB = UserDB();
+  final _friendDB = FriendShipDB();
   User? _currentUser;
   MemoryImage? _currentUserImage;
   List<User>? users = [];
+  List<User>? allUsers = [];
 
   @override
   void initState() {
     super.initState();
     _searchInputController.addListener(_onSearchInputChanged);
-    initInfor(); // Call the initialization function here
+    _pageController.addListener(_onInit);
+    initInfor();
   }
 
   void _onSearchInputChanged() {
@@ -63,14 +68,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _search() {
-    _userDB
-        .fetchAll(phoneNumber: _searchInputController.text.trim())
-        .then((value) {
-      setState(() {
-        users = value;
-      });
+  void _onInit() async {
+    setState(() async {
+      allUsers = await _friendDB.fetchFriendsOfUser(
+          await SharedPreferencesHelper.getInt('userId') ?? 0);
     });
+  }
+
+  void _search() {
+    if (_searchInputController.text.trim() != null &&
+        _searchInputController.text.trim().length > 0) {
+      _userDB
+          .fetchAll(phoneNumber: _searchInputController.text.trim())
+          .then((value) {
+        setState(() {
+          users = value;
+        });
+      });
+    }
   }
 
   @override
@@ -78,6 +93,7 @@ class _HomePageState extends State<HomePage> {
     _searchInputController.removeListener(_onSearchInputChanged);
     _searchInputController.dispose();
     _pageController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -104,6 +120,7 @@ class _HomePageState extends State<HomePage> {
                 controller: _searchInputController,
                 cursorColor: const Color.fromARGB(255, 17, 172, 255),
                 cursorHeight: 25,
+                focusNode: _searchFocusNode,
                 cursorRadius: const Radius.circular(50),
                 mouseCursor: MouseCursor.defer,
                 style: const TextStyle(color: Colors.black),
@@ -136,6 +153,7 @@ class _HomePageState extends State<HomePage> {
                 onEditingComplete: () {
                   _search();
                 },
+                onFieldSubmitted: (value) => _searchFocusNode.unfocus(),
               ),
             ),
             const SizedBox(width: 17),
@@ -271,8 +289,16 @@ class _HomePageState extends State<HomePage> {
       controller: _pageController,
       children: [
         // Content for the "Call" tab
-        const Center(
-          child: Text('Call Tab'),
+        Center(
+          child: allUsers!.isEmpty
+              ? const Center(child: Text('No users found'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(0),
+                  itemCount: allUsers!.length,
+                  itemBuilder: (context, index) {
+                    return UserCard(user: allUsers![index]);
+                  },
+                ),
         ),
         // Content for the "Add friend" tab
         Center(
@@ -294,6 +320,8 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isLoading = true;
     });
+
+    allUsers = await _userDB.fetchAll();
 
     try {
       final userId = await SharedPreferencesHelper.getInt('userId');

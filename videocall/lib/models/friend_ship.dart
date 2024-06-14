@@ -1,9 +1,9 @@
-class Friendship {
+class FriendShip {
   int? id;
   int user1Id;
   int user2Id;
 
-  Friendship({
+  FriendShip({
     this.id,
     required this.user1Id,
     required this.user2Id,
@@ -17,8 +17,8 @@ class Friendship {
     };
   }
 
-  factory Friendship.fromMap(Map<String, dynamic> map) {
-    return Friendship(
+  factory FriendShip.fromMap(Map<String, dynamic> map) {
+    return FriendShip(
       id: map['id'],
       user1Id: map['user1_id'],
       user2Id: map['user2_id'],

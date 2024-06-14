@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:videocall/helpers/common.dart';
 import 'package:videocall/models/user.dart';
+import 'package:videocall/pages/user_detail.dart';
 
 class UserCard extends StatefulWidget {
   final User user;
@@ -45,13 +46,21 @@ class _UserCardState extends State<UserCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 1.5,
+      elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(0),
       ),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserDetailPage(user: widget.user),
+            ),
+          );
+        },
         leading: CircleAvatar(
-          radius: 35,
+          radius: 30,
           backgroundImage: _avatar != null
               ? _avatar as ImageProvider
               : const AssetImage('assets/images/default_avatar.jpg')
@@ -67,7 +76,7 @@ class _UserCardState extends State<UserCard> {
           widget.user.name,
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        subtitle: const Text('Tap for more details'),
       ),
     );
   }

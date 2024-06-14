@@ -18,7 +18,7 @@ class _SignInPageState extends State<SignInPage> {
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>(); // Key to manage the form state
   final _phoneController = TextEditingController(text: '0368728267');
-  final _passwordController = TextEditingController(text: '111111');
+  final _passwordController = TextEditingController(text: '123456');
   final _userDB = UserDB(); // Database helper
   final _authDB = AuthDB();
 
@@ -214,9 +214,9 @@ class _SignInPageState extends State<SignInPage> {
       final password = _passwordController.text;
 
       setState(() {
-        _isLoading = true;
+        // _isLoading = true;
         _authDB.logIn(phone, password, 500).then((value) {
-          _isLoading = false;
+          // _isLoading = false;
           if (mounted) {
             // Check if the widget is still mounted
             if (value) {
