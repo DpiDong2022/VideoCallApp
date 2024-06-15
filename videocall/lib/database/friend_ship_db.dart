@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:videocall/models/friend_ship.dart';
 import 'package:videocall/models/user.dart';
 import 'database_service.dart';
@@ -47,6 +48,18 @@ class FriendShipDB {
       'DELETE FROM ${FriendShip.tableName} WHERE id = ?;',
       [id],
     );
+  }
+
+  Future<bool> isFriend(int currentUserId, int userId) async {
+    final database = await DatabaseService().database;
+    var data = await database.rawQuery("""SELECT 1 FROM ${FriendShip.tableName} 
+      WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)""",
+        [currentUserId, userId, userId, currentUserId]);
+    if (data.isNotEmpty) {
+      var rs = data[0].values.first.toString();
+      return rs == "1";
+    }
+    return false;
   }
 
   Future<List<User>> fetchFriendsOfUser(int userId, String key) async {

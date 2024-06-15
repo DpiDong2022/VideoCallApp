@@ -50,7 +50,9 @@ class Common {
       {Color? backgroundColor,
       Color? boderSideColor,
       Color? textColor,
-      double? fontSize}) {
+      double? fontSize,
+      Size? size,
+      double? circular}) {
     return ButtonStyle(
         foregroundColor: MaterialStateColor.resolveWith(
             (states) => (textColor == null) ? Colors.black : textColor),
@@ -58,10 +60,10 @@ class Common {
             TextStyle(fontSize: (fontSize == null) ? 20 : fontSize)),
         backgroundColor: MaterialStateProperty.all(
             (backgroundColor == null) ? Colors.white : backgroundColor),
-        fixedSize: MaterialStateProperty.all(const Size(300, 58)),
+        fixedSize: MaterialStateProperty.all(size ?? const Size(300, 58)),
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(27),
+                borderRadius: BorderRadius.circular(circular ?? 27),
                 side: BorderSide(
                     color: (boderSideColor == null)
                         ? Colors.white

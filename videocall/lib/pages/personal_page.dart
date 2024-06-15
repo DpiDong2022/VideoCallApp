@@ -206,6 +206,7 @@ class _PersonalPageState extends State<PersonalPage> {
     return Stack(
       children: [
         Scaffold(
+          backgroundColor: Colors.white,
           resizeToAvoidBottomInset: false,
           appBar: _appBar(),
           body: _body(),
