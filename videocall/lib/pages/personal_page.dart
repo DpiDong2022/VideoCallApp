@@ -144,59 +144,173 @@ class _PersonalPageState extends State<PersonalPage> {
       ),
       backgroundColor: Colors.blue[700],
       title: const Text('Change Personal Information'),
-      titleTextStyle: const TextStyle(color: Colors.white, fontSize: 18),
+      titleTextStyle: const TextStyle(
+          color: Colors.white, fontSize: 18, fontWeight: FontWeight.w300),
     );
   }
 
-  SafeArea _body() {
-    return SafeArea(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_isLoading) Common.linearProgress(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: TextFormField(
-                controller: _nameController,
-                decoration: Common.customDecoration(
-                    labelText: 'Account Name',
-                    prefixIcon: Icons.account_box_outlined),
+  Widget _body2() {
+    return _buildPhoneNumberTab2();
+  }
+
+  Widget _buildPhoneNumberTab2() {
+    return Container(
+      color: const Color.fromARGB(255, 234, 252, 254).withOpacity(0.3),
+      child: Column(
+        children: [
+          Expanded(
+            flex: 7,
+            child: Container(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // const Text(
+                    //   "Change personal information",
+                    //   style: TextStyle(
+                    //       color: Colors.black,
+                    //       fontSize: 20,
+                    //       fontWeight: FontWeight.w300,
+                    //       letterSpacing: 0.0000001),
+                    // ),
+                    // SizedBox.fromSize(size: const Size(0, 15)),
+                    Center(
+                      child: CircleAvatar(
+                        radius: 120,
+                        backgroundImage: _selectedImage != null
+                            ? FileImage(_selectedImage!) // Show picked image
+                            : (_currentUserImage ??
+                                    const AssetImage(
+                                        'assets/images/default_avatar.jpg'))
+                                as ImageProvider, // Show default image if none selected
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Column(
+                        children: [
+                          TextButton(
+                            onPressed: () => _pickImage(ImageSource.gallery),
+                            style: Common.customButtonStyle(
+                                fontSize: 15,
+                                backgroundColorHover:
+                                    const Color.fromARGB(255, 91, 198, 251),
+                                textColorHover:
+                                    const Color.fromARGB(255, 6, 45, 102),
+                                backgroundColor: Colors.blue,
+                                textColor: Colors.white,
+                                circular: 4,
+                                size: const Size(200, 40),
+                                boderSideColor:
+                                    const Color.fromARGB(255, 91, 198, 251)),
+                            child: const Text(
+                              'Choose from Gallery',
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextButton(
+                            onPressed: () => _pickImage(ImageSource.camera),
+                            style: Common.customButtonStyle(
+                                fontSize: 15,
+                                backgroundColorHover:
+                                    const Color.fromARGB(255, 91, 198, 251),
+                                textColorHover:
+                                    const Color.fromARGB(255, 6, 45, 102),
+                                backgroundColor: Colors.blue,
+                                textColor: Colors.white,
+                                circular: 4,
+                                size: const Size(200, 40),
+                                boderSideColor:
+                                    const Color.fromARGB(255, 91, 198, 251)),
+                            child: const Text(
+                              'Take a Picture',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox.fromSize(size: const Size(0, 15)),
+                    Material(
+                      shadowColor: Colors.blue.shade500.withOpacity(0.3),
+                      elevation: 2.8,
+                      child: TextFormField(
+                        enabled: false,
+                        cursorColor: Colors.blue.shade400,
+                        textAlignVertical: const TextAlignVertical(y: 1),
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        style: const TextStyle(
+                            fontSize: 16, height: 0.8, letterSpacing: 0.0001),
+                        decoration:
+                            Common.customDecoration2(labelText: 'Phone number'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your phone number';
+                          }
+                          if (value.length != 10) {
+                            return 'Phone number must be 10 digits';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox.fromSize(size: const Size(0, 15)),
+                    Material(
+                      shadowColor: Colors.blue.shade500.withOpacity(0.3),
+                      elevation: 2.8,
+                      child: TextFormField(
+                        cursorColor: Colors.blue.shade400,
+                        textAlignVertical: const TextAlignVertical(y: 1),
+                        controller: _nameController,
+                        style: const TextStyle(
+                            fontSize: 16, height: 0.8, letterSpacing: 0.0001),
+                        decoration:
+                            Common.customDecoration2(labelText: 'Account Name'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your phone number';
+                          }
+                          if (value.length != 10) {
+                            return 'Phone number must be 10 digits';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: Common.customDecoration(
-                    labelText: 'Phone number', prefixIcon: Icons.phone),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              child: Column(
+                children: [
+                  TextButton(
+                    onPressed: _saveInformation,
+                    style: Common.customButtonStyle(
+                        backgroundColorHover:
+                            const Color.fromARGB(255, 91, 198, 251),
+                        textColorHover: const Color.fromARGB(255, 6, 45, 102),
+                        backgroundColor: Colors.blue,
+                        textColor: Colors.white,
+                        circular: 4,
+                        size: const Size(300, 50),
+                        boderSideColor:
+                            const Color.fromARGB(255, 91, 198, 251)),
+                    child: const Text(
+                      'Save',
+                    ),
+                  )
+                ],
               ),
             ),
-            CircleAvatar(
-              radius: 120,
-              backgroundImage: _selectedImage != null
-                  ? FileImage(_selectedImage!) // Show picked image
-                  : (_currentUserImage ??
-                          const AssetImage('assets/images/default_avatar.jpg'))
-                      as ImageProvider, // Show default image if none selected
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () => _pickImage(ImageSource.gallery),
-              child: const Text('Choose from Gallery'),
-            ),
-            ElevatedButton(
-              onPressed: () => _pickImage(ImageSource.camera),
-              child: const Text('Take a Picture'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _saveInformation,
-              child: const Text('Save'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -206,9 +320,10 @@ class _PersonalPageState extends State<PersonalPage> {
     return Stack(
       children: [
         Scaffold(
+          backgroundColor: Colors.white,
           resizeToAvoidBottomInset: false,
           appBar: _appBar(),
-          body: _body(),
+          body: _body2(),
         ),
         if (_isLoading) Common.circularProgress()
       ],

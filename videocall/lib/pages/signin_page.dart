@@ -18,7 +18,7 @@ class _SignInPageState extends State<SignInPage> {
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>(); // Key to manage the form state
   final _phoneController = TextEditingController(text: '0368728267');
-  final _passwordController = TextEditingController(text: '111111');
+  final _passwordController = TextEditingController(text: '123456');
   final _userDB = UserDB(); // Database helper
   final _authDB = AuthDB();
 
@@ -27,11 +27,11 @@ class _SignInPageState extends State<SignInPage> {
     return Stack(
       children: [
         Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/bg-begin.png'),
-              fit: BoxFit.cover,
-            ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                colors: [Color.fromARGB(255, 5, 30, 66), Colors.blue.shade700],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomRight),
           ),
           padding: const EdgeInsets.all(0),
           child: Scaffold(
@@ -52,12 +52,16 @@ class _SignInPageState extends State<SignInPage> {
                           'Welcome Back',
                           textAlign: TextAlign.start,
                           style: TextStyle(
-                              fontSize: 40, fontWeight: FontWeight.bold),
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
                         ),
-                        Text('How\'s it going bro',
+                        Text('How\'s it going!',
                             textAlign: TextAlign.start,
                             style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w400)),
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w400)),
                       ],
                     ),
                   ),
@@ -73,8 +77,12 @@ class _SignInPageState extends State<SignInPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextFormField(
+                          cursorColor: Colors.white,
+                          cursorErrorColor: Colors.white,
+                          cursorHeight: 25,
                           controller: _phoneController,
-                          style: const TextStyle(fontSize: 20, height: 0.8),
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.white),
                           keyboardType: TextInputType.number,
                           decoration: Common.customDecoration(
                               labelText: 'Phone number',
@@ -92,22 +100,35 @@ class _SignInPageState extends State<SignInPage> {
                         const Padding(
                             padding: EdgeInsets.symmetric(vertical: 10)),
                         TextFormField(
+                          cursorColor: Colors.white,
+                          cursorErrorColor: Colors.white,
+                          cursorHeight: 25,
                           controller: _passwordController,
-                          style: const TextStyle(fontSize: 20, height: 0.8),
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.white),
                           obscureText: _isHidePassword,
                           decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            labelText: 'Password',
-                            labelStyle: const TextStyle(color: Colors.black),
+                            border: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 0.6,
+                              ),
+                            ),
+                            hintText: "Password",
+                            hintStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w300),
+                            // labelStyle: const TextStyle(color: Colors.black),
                             errorStyle: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.red.shade600),
+                                color: Colors.red.shade100),
                             prefixIcon: const Icon(
                               Icons.lock,
-                              color: Colors.black,
+                              color: Colors.white,
                             ),
                             suffixIcon: IconButton(
-                              color: Colors.black,
+                              color: Colors.white,
                               onPressed: () {
                                 setState(() {
                                   _isHidePassword = !_isHidePassword;
@@ -119,15 +140,27 @@ class _SignInPageState extends State<SignInPage> {
                                     : Icons.remove_red_eye,
                               ),
                             ),
-                            focusedBorder: const UnderlineInputBorder(),
-                            focusedErrorBorder: const UnderlineInputBorder(
+                            focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(
-                                color: Colors.red,
-                                width: 2.0,
+                                color: Colors.white,
+                                width: 0.6,
                               ),
                             ),
-                            errorBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(width: 0.6),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 0.6,
+                              ),
+                            ),
+                            focusedErrorBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 0.6,
+                              ),
+                            ),
+                            errorBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(width: 0.6, color: Colors.white),
                             ),
                           ),
                           validator: (value) {
@@ -150,22 +183,25 @@ class _SignInPageState extends State<SignInPage> {
                             );
                           },
                           style: ButtonStyle(
+                            animationDuration: const Duration(microseconds: 1),
                             foregroundColor:
                                 MaterialStateProperty.resolveWith<Color>(
                               (Set<MaterialState> states) {
                                 if (states.contains(MaterialState.pressed)) {
-                                  return Colors.white;
+                                  return Colors.blue;
                                 }
-                                return Colors.black;
+                                return Colors.white;
                               },
                             ),
-                            overlayColor: MaterialStateProperty.all<Color>(
-                                Colors.transparent),
+                            overlayColor:
+                                MaterialStateProperty.all<Color>(Colors.blue),
                           ),
                           child: const Text(
                             'Forgot password?',
-                            style:
-                                TextStyle(decoration: TextDecoration.underline),
+                            style: TextStyle(
+                                decorationColor: Colors.white,
+                                decoration: TextDecoration.underline,
+                                color: Colors.white),
                           ),
                         ),
                       ],
@@ -180,7 +216,17 @@ class _SignInPageState extends State<SignInPage> {
                         children: [
                           TextButton(
                             onPressed: _signIn, // Handle sign-in logic
-                            style: Common.customButtonStyle(),
+                            style: Common.customButtonStyle(
+                                backgroundColorHover:
+                                    const Color.fromARGB(255, 91, 198, 251),
+                                textColorHover:
+                                    const Color.fromARGB(255, 6, 45, 102),
+                                backgroundColor: Colors.blue,
+                                textColor: Colors.white,
+                                circular: 4,
+                                size: const Size(280, 50),
+                                boderSideColor:
+                                    const Color.fromARGB(255, 91, 198, 251)),
                             child: const Text('Login'),
                           ),
                           const Padding(
@@ -189,7 +235,17 @@ class _SignInPageState extends State<SignInPage> {
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            style: Common.customButtonStyle(),
+                            style: Common.customButtonStyle(
+                                backgroundColorHover:
+                                    const Color.fromARGB(255, 91, 198, 251),
+                                textColorHover:
+                                    const Color.fromARGB(255, 6, 45, 102),
+                                backgroundColor: Colors.blue,
+                                textColor: Colors.white,
+                                circular: 4,
+                                size: const Size(280, 50),
+                                boderSideColor:
+                                    const Color.fromARGB(255, 91, 198, 251)),
                             child: const Text(
                               'Back to previous',
                             ),
@@ -214,9 +270,9 @@ class _SignInPageState extends State<SignInPage> {
       final password = _passwordController.text;
 
       setState(() {
-        _isLoading = true;
+        // _isLoading = true;
         _authDB.logIn(phone, password, 500).then((value) {
-          _isLoading = false;
+          // _isLoading = false;
           if (mounted) {
             // Check if the widget is still mounted
             if (value) {

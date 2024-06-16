@@ -5,27 +5,96 @@ import 'dart:io';
 
 class Common {
   static InputDecoration customDecoration(
-      {required String? labelText, IconData? prefixIcon}) {
+      {required String? labelText,
+      IconData? prefixIcon,
+      Color? prefixIconColor}) {
     return InputDecoration(
-      border: const OutlineInputBorder(),
-      labelText: labelText,
-      labelStyle: const TextStyle(color: Colors.black),
+      hintText: labelText,
+      hintStyle: const TextStyle(
+          color: Colors.white, fontSize: 15, fontWeight: FontWeight.w300),
+      floatingLabelStyle: const TextStyle(color: Colors.white),
+      border: const UnderlineInputBorder(
+          borderSide: BorderSide(
+        color: Colors.white,
+        width: 0.6,
+      )),
+      // labelStyle: const TextStyle(color: Colors.white),
       prefixIcon: Icon(
         (prefixIcon == null) ? null : prefixIcon,
-        color: Colors.black,
+        color: prefixIconColor ?? Colors.white,
       ),
-      focusedBorder: const UnderlineInputBorder(),
-      focusedErrorBorder: const UnderlineInputBorder(
+      focusedBorder: const UnderlineInputBorder(
         borderSide: BorderSide(
-          color: Colors.red,
-          width: 2.0,
+          color: Colors.white,
+          width: 0.6,
         ),
       ),
-      errorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(width: 0.6),
+      focusedErrorBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.white,
+          width: 0.6,
+        ),
       ),
+      errorBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(width: 0.6, color: Colors.white),
+      ),
+      enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(
+        color: Colors.white,
+        width: 0.6,
+      )),
       errorStyle:
-          TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade600),
+          TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade100),
+    );
+  }
+
+  static InputDecoration customDecoration2(
+      {required String? labelText, IconButton? suffixIcon}) {
+    return InputDecoration(
+      suffixIcon: suffixIcon,
+      suffixIconColor: Colors.blue.shade400,
+      // hintText: labelText,
+      // hintStyle: const TextStyle(
+      //     color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
+      floatingLabelStyle: TextStyle(color: Colors.blue.shade400),
+      floatingLabelAlignment: FloatingLabelAlignment.start,
+      border: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(3)),
+          borderSide: BorderSide(
+            color: Colors.blue.shade100,
+            width: 0.6,
+          )),
+      labelText: labelText,
+      labelStyle: const TextStyle(
+          color: Colors.black, fontWeight: FontWeight.w300, fontSize: 15),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(3)),
+        borderSide: BorderSide(
+          color: Colors.blue.shade400,
+          width: 0.6,
+        ),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(3)),
+        borderSide: BorderSide(
+          color: Colors.blue.shade400,
+          width: 0.6,
+        ),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(3)),
+        borderSide: BorderSide(width: 0.6, color: Colors.blue.shade400),
+      ),
+      enabledBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(3)),
+          borderSide: BorderSide(
+            color: Colors.blue.shade400,
+            width: 0.6,
+          )),
+      errorStyle: const TextStyle(
+          backgroundColor: Colors.transparent,
+          fontWeight: FontWeight.bold,
+          color: Color.fromARGB(255, 255, 89, 105)),
     );
   }
 
@@ -48,20 +117,48 @@ class Common {
 
   static ButtonStyle customButtonStyle(
       {Color? backgroundColor,
+      Color? backgroundColorHover,
       Color? boderSideColor,
       Color? textColor,
-      double? fontSize}) {
+      double? fontSize,
+      Size? size,
+      double? circular,
+      FontWeight? fontWeight,
+      Color? textColorHover,
+      Duration? animationDuration}) {
     return ButtonStyle(
-        foregroundColor: MaterialStateColor.resolveWith(
-            (states) => (textColor == null) ? Colors.black : textColor),
-        textStyle: MaterialStateProperty.all(
-            TextStyle(fontSize: (fontSize == null) ? 20 : fontSize)),
-        backgroundColor: MaterialStateProperty.all(
-            (backgroundColor == null) ? Colors.white : backgroundColor),
-        fixedSize: MaterialStateProperty.all(const Size(300, 58)),
+        animationDuration: animationDuration ?? const Duration(milliseconds: 1),
+        foregroundColor: MaterialStateColor.resolveWith((states) {
+          if (states.contains(MaterialState.hovered) ||
+              states.contains(MaterialState.pressed) ||
+              states.contains(MaterialState.focused)) {
+            return textColorHover ?? Colors.black;
+          }
+          return textColor ?? Colors.black;
+        }),
+        textStyle: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.hovered) ||
+              states.contains(MaterialState.pressed) ||
+              states.contains(MaterialState.focused)) {
+            return TextStyle(
+                fontSize: (fontSize == null) ? 20 : fontSize,
+                fontWeight: fontWeight ?? FontWeight.w300);
+          } else {
+            return TextStyle(
+                fontSize: (fontSize == null) ? 20 : fontSize,
+                fontWeight: fontWeight ?? FontWeight.w300);
+          }
+        }),
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.pressed)) {
+            return backgroundColorHover ?? Colors.white;
+          }
+          return backgroundColor ?? Colors.white; // Default background color
+        }),
+        fixedSize: MaterialStateProperty.all(size ?? const Size(300, 58)),
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(27),
+                borderRadius: BorderRadius.circular(circular ?? 27),
                 side: BorderSide(
                     color: (boderSideColor == null)
                         ? Colors.white

@@ -1,3 +1,4 @@
+import 'package:videocall/helpers/enum_helper.dart';
 import 'package:videocall/models/base_model.dart';
 
 class User extends BaseModel {
@@ -7,6 +8,7 @@ class User extends BaseModel {
   String password;
   String? image;
   bool isUsing;
+  UserTypeEnum userType = UserTypeEnum.FRIEND;
 
   User({
     this.id,
