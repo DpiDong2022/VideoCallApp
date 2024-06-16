@@ -1,13 +1,15 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 import 'package:videocall/models/user.dart';
 
 class VideoCallPage extends StatefulWidget {
   final User user;
 
-  const VideoCallPage({Key? key, required this.user}) : super(key: key);
+  const VideoCallPage({super.key, required this.user});
 
   @override
+  // ignore: library_private_types_in_public_api
   _VideoCallPageState createState() => _VideoCallPageState();
 }
 
@@ -18,7 +20,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
   bool _isMicOn = true;
   bool _isCameraOn = true;
 
-  // Variables to manage draggable camera preview
+  late VideoPlayerController _videoController;
+
   late double _previewLeft;
   late double _previewTop;
   late double _dragStartX;
@@ -27,9 +30,16 @@ class _VideoCallPageState extends State<VideoCallPage> {
   @override
   void initState() {
     super.initState();
-    _previewLeft = 20; // Initial left position
-    _previewTop = 40; // Initial top position
+    _previewLeft = 20;
+    _previewTop = 40;
     _initializeCamera();
+
+    // Initialize video controller with asset
+    _videoController = VideoPlayerController.asset(
+      'assets/videos/fake_video_call.mp4',
+    );
+
+    _initializeVideoPlayer();
   }
 
   Future<void> _initializeCamera() async {
@@ -57,38 +67,40 @@ class _VideoCallPageState extends State<VideoCallPage> {
     }
   }
 
-  // Method to toggle microphone on/off
+  Future<void> _initializeVideoPlayer() async {
+    await _videoController.initialize();
+    _videoController.setLooping(true);
+    _videoController.play();
+    setState(() {});
+  }
+
   void _toggleMic() {
     setState(() {
       _isMicOn = !_isMicOn;
     });
   }
 
-  // Method to toggle camera on/off
   void _toggleCamera() {
     setState(() {
       _isCameraOn = !_isCameraOn;
       if (_isCameraOn) {
         _cameraController.initialize();
-      } else {
-        _cameraController.dispose();
-      }
+      } else {}
     });
   }
 
   @override
   void dispose() {
     _cameraController.dispose();
+    _videoController.dispose();
     super.dispose();
   }
 
-  // Method to handle drag gesture start
   void _onDragStart(DragStartDetails details) {
     _dragStartX = details.globalPosition.dx - _previewLeft;
     _dragStartY = details.globalPosition.dy - _previewTop;
   }
 
-  // Method to handle drag gesture update
   void _onDragUpdate(DragUpdateDetails details) {
     setState(() {
       _previewLeft = details.globalPosition.dx - _dragStartX;
@@ -103,18 +115,18 @@ class _VideoCallPageState extends State<VideoCallPage> {
       body: _isCameraInitialized
           ? Stack(
               children: [
-                // Fake video call full screen
-                Container(
-                  color: Color.fromARGB(255, 81, 197, 83),
-                  child: Center(
-                    child: Text(
-                      'Fake Video Call',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                      ),
-                    ),
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _videoController.value.isInitialized
+                        ? Positioned(
+                            child: AspectRatio(
+                              aspectRatio: _videoController.value.aspectRatio,
+                              child: VideoPlayer(_videoController),
+                            ),
+                          )
+                        : Container(),
+                  ],
                 ),
                 // Camera preview draggable
                 Positioned(
@@ -143,7 +155,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
                     ),
                   ),
                 ),
-                // End call button at the bottom center
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
@@ -159,7 +170,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
                             color: _isMicOn ? Colors.white : Colors.red,
                           ),
                         ),
-                        SizedBox(width: 24),
+                        const SizedBox(width: 24),
                         // Toggle camera button
                         IconButton(
                           onPressed: _toggleCamera,
@@ -168,14 +179,17 @@ class _VideoCallPageState extends State<VideoCallPage> {
                             color: _isCameraOn ? Colors.white : Colors.red,
                           ),
                         ),
-                        SizedBox(width: 24),
+                        const SizedBox(width: 24),
                         // End call button
                         FloatingActionButton(
                           backgroundColor: Colors.red,
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: Icon(Icons.call_end),
+                          child: const Icon(
+                            Icons.call_end,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -183,7 +197,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
                 ),
               ],
             )
-          : Center(child: CircularProgressIndicator()),
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }
