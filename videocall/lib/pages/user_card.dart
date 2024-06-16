@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:videocall/helpers/common.dart';
 import 'package:videocall/helpers/enum_helper.dart';
 import 'package:videocall/models/user.dart';
@@ -17,11 +18,13 @@ class UserCard extends StatefulWidget {
 class _UserCardState extends State<UserCard> {
   MemoryImage? _avatar;
   bool _isLoading = true;
+  ImageProvider? avatar;
 
   @override
   void initState() {
     super.initState();
     _initializeAvatar();
+    if (widget.user.image!.isNotEmpty) {}
   }
 
   Future<void> _initializeAvatar() async {
@@ -33,7 +36,6 @@ class _UserCardState extends State<UserCard> {
           _isLoading = false;
         });
       } catch (e) {
-        print('Error loading avatar: $e');
         setState(() {
           _isLoading = false;
         });
@@ -45,27 +47,97 @@ class _UserCardState extends State<UserCard> {
     }
   }
 
+  Future<void> _showProfileDialog() async {
+    showDialog(
+      barrierColor: Colors.black.withOpacity(0.7),
+      context: context,
+      builder: (BuildContext context) {
+        if (widget.user.image!.isEmpty) {
+          return const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image(
+                  image: AssetImage("assets/images/default_avatar.jpg")
+                      as ImageProvider),
+            ],
+          );
+        } else {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image(image: _avatar as ImageProvider),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  void _showUnfriendConfirmationDialog() {
+    showDialog(
+      barrierColor: Colors.black.withOpacity(0.7),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          title: const Text(
+            'Unfriend Confirmation',
+            style: TextStyle(fontSize: 18),
+          ),
+          content:
+              Text('Are you sure you want to unfriend ${widget.user.name}?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Unfriend',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Common.customScaffoldMessager(
+                  context: context,
+                  message: "You have unfriended ${widget.user.name}!",
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          vertical: 0.0), // Small vertical padding to separate cards slightly
+      padding: const EdgeInsets.symmetric(vertical: 0.0),
       child: Card(
         shadowColor: Colors.white,
         color: Colors.white,
         surfaceTintColor: Colors.white,
-        margin: EdgeInsets.zero, // Remove default margin
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0), // Apply corner radius
+          borderRadius: BorderRadius.circular(0),
           side: const BorderSide(
-            color: Colors.black, // Set the border color
-            width: 0.05, // Set the border width
+            color: Colors.black,
+            width: 0.05,
           ),
         ),
-
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12.0, vertical: 8.0), // Adjust as needed
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           leading: CircleAvatar(
             radius: 30,
             backgroundImage: _avatar != null
@@ -90,39 +162,39 @@ class _UserCardState extends State<UserCard> {
             elevation: 15,
             offset: const Offset(-10, 38),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8), // Rounded corners
+              borderRadius: BorderRadius.circular(8),
             ),
             surfaceTintColor: Colors.white,
             onSelected: (value) {
               switch (value) {
                 case 'View profile picture':
+                  _showProfileDialog();
                   break;
                 case 'Copy phone number':
                   Clipboard.setData(ClipboardData(text: widget.user.phone));
                   Common.customScaffoldMessager(
-                      context: context,
-                      message: "The phone number has been saved!");
+                    context: context,
+                    message: "The phone number has been saved!",
+                  );
                   break;
                 case 'Call':
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              VideoCallPage(user: widget.user)));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VideoCallPage(user: widget.user),
+                    ),
+                  );
                   break;
                 case 'Add friend':
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              VideoCallPage(user: widget.user)));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VideoCallPage(user: widget.user),
+                    ),
+                  );
                   break;
                 case 'Unfriend':
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              VideoCallPage(user: widget.user)));
+                  _showUnfriendConfirmationDialog();
                   break;
               }
             },

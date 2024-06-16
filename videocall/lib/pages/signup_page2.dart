@@ -2,21 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:videocall/database/auth.dart';
 import 'package:videocall/database/user_db.dart';
 import 'package:videocall/helpers/common.dart';
+import 'package:videocall/models/user.dart';
 
-class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({super.key});
+class SignUp2Page extends StatefulWidget {
+  const SignUp2Page({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
+  _Signup2PageState createState() => _Signup2PageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage>
+class _Signup2PageState extends State<SignUp2Page>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _phoneController = TextEditingController();
   final _codeController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _userDB = UserDB();
   final _authDB = AuthDB();
@@ -27,11 +29,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
   final FocusNode _phoneFocusNode = FocusNode();
   final FocusNode _codeFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
+  final FocusNode _nameFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
 
     // Autofocus the first input field when the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -57,6 +60,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
               _passwordFocusNode.requestFocus();
             });
             break;
+          case 3:
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _nameFocusNode.requestFocus();
+            });
+            break;
         }
       }
     });
@@ -68,58 +76,70 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
     _phoneController.dispose();
     _codeController.dispose();
     _passwordController.dispose();
+    _nameController.dispose();
     _phoneFocusNode.dispose();
     _codeFocusNode.dispose();
     _passwordFocusNode.dispose();
+    _nameFocusNode.dispose();
     super.dispose();
   }
 
-  void _verifyCode() {
-    // Simulate code verification
+  Future<void> _validatePhoneNumber(context) async {
+    if (_formKey.currentState?.validate() ?? false) {
+      var user = await _userDB.fetchByPhone(_phoneController.text.trim());
+      if (mounted) {
+        if (user != null) {
+          Common.customScaffoldMessager(
+              context: context,
+              message: 'Your phone number has been registered!',
+              duration: const Duration(milliseconds: 2000));
+        } else {
+          _tabController.animateTo(1); // Mo
+        }
+      }
+    }
+  }
+
+  void _verifyCode(context) {
     if (_codeController.text.isNotEmpty) {
-      _tabController.animateTo(2); // Move to the next tab
+      Common.customScaffoldMessager(
+          context: context,
+          message: 'Code verified successfully.',
+          duration: const Duration(milliseconds: 2000));
+      _tabController.animateTo(2);
     } else {
       Common.customScaffoldMessager(
           context: context,
-          message: 'Please enter the verification code.',
+          message: 'Please enter your verified code.',
           duration: const Duration(milliseconds: 2000));
     }
   }
 
-  void _resetPassword() async {
+  void _setPassword(context) {
     if (_formKey.currentState?.validate() ?? false) {
-      // Simulate password reset
-      var isSuccessed = await _authDB.changePassword(
-          _phoneController.text.trim(), _passwordController.text.trim());
-      if (mounted) {
-        if (isSuccessed) {
-          Common.customScaffoldMessager(
-              context: context,
-              message: 'Password has been reset.',
-              duration: const Duration(milliseconds: 3000));
-          Navigator.pop(context);
-        } else {
-          Common.customScaffoldMessager(
-              context: context,
-              message: 'Something went wrong! Software is updating...',
-              duration: const Duration(milliseconds: 2000));
-        }
-      } // Go back to the previous screen
+      _tabController.animateTo(3);
     }
   }
 
-  void _validatePhoneNumber() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      var user = await _userDB.fetchByPhone(_phoneController.text.trim());
-      if (mounted) {
-        if (user == null) {
-          Common.customScaffoldMessager(
-              context: context,
-              message: 'Your phone number has not been registered yet.',
-              duration: const Duration(milliseconds: 2000));
-        } else {
-          _tabController.animateTo(1); // Move to the next tab
-        }
+  Future<void> _saveAccount(context) async {
+    if (_nameController.text.isNotEmpty) {
+      Future<int?> id = _userDB.create(
+          user: User(
+              name: _nameController.text.trim(),
+              phone: _phoneController.text.trim(),
+              password: _passwordController.text.trim(),
+              image: null,
+              isUsing: false));
+      if (id != null && id != 0) {
+        Common.customScaffoldMessager(
+            context: context,
+            message: 'Account created successfully.',
+            duration: const Duration(milliseconds: 2000));
+      } else {
+        Common.customScaffoldMessager(
+            context: context,
+            message: 'Something went wrong! Software is updating...',
+            duration: const Duration(milliseconds: 2000));
       }
     }
   }
@@ -133,12 +153,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
         key: _formKey,
         child: TabBarView(
           controller: _tabController,
-          physics:
-              const NeverScrollableScrollPhysics(), // Prevent swipe navigation
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             _buildPhoneNumberTab2(),
             _buildVerificationCodeTab2(),
             _buildNewPasswordTab2(),
+            _buildAccountDetailsTab2(),
           ],
         ),
       ),
@@ -156,54 +176,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
         },
         icon: Icon(Icons.arrow_back_ios_rounded, color: Colors.blue.shade800),
       ),
-      // title: const Text('Forgot password'),
-      // titleTextStyle: TextStyle(color: Colors.blue.shade800, fontSize: 18),
     );
   }
-
-  // Widget _buildPhoneNumberTab() {
-  //   return Center(
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(16.0),
-  //       child: Column(
-  //         mainAxisSize: MainAxisSize.min, // Centers the Column's content
-  //         crossAxisAlignment: CrossAxisAlignment.center,
-  //         children: [
-  //           const Text(
-  //             'Enter your phone number to reset your password:',
-  //             style: TextStyle(fontSize: 16),
-  //           ),
-  //           const SizedBox(height: 20),
-  //           TextFormField(
-  //             controller: _phoneController,
-  //             keyboardType: TextInputType.phone,
-  //             style: const TextStyle(fontSize: 20, height: 0.8),
-  //             focusNode: _phoneFocusNode, // Attach the FocusNode
-  //             decoration: Common.customDecoration(
-  //                 labelText: 'Phone number', prefixIcon: Icons.phone),
-  //             validator: (value) {
-  //               if (value == null || value.isEmpty) {
-  //                 return 'Please enter your phone number';
-  //               }
-  //               if (value.length != 10) {
-  //                 return 'Phone number must be 10 digits';
-  //               }
-  //               return null;
-  //             },
-  //           ),
-  //           const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
-  //           TextButton(
-  //             onPressed: _validatePhoneNumber, // Handle sign-in logic
-  //             style: Common.customButtonStyle(boderSideColor: Colors.black),
-  //             child: const Text(
-  //               'Send code',
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildPhoneNumberTab2() {
     return Container(
@@ -221,7 +195,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Reset your password",
+                      "Create your new account",
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 23,
@@ -253,10 +227,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                             Common.customDecoration2(labelText: 'Phone number'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your phone number';
-                          }
-                          if (value.length != 10) {
-                            return 'Phone number must be 10 digits';
+                            return 'Please enter your phone number!';
+                          } else if (value.length != 10) {
+                            return 'Phone number must be 10 digits!';
                           }
                           return null;
                         },
@@ -273,7 +246,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
               child: Column(
                 children: [
                   TextButton(
-                    onPressed: _validatePhoneNumber,
+                    onPressed: () {
+                      _validatePhoneNumber(context);
+                    },
                     style: Common.customButtonStyle(
                         backgroundColorHover:
                             const Color.fromARGB(255, 91, 198, 251),
@@ -313,7 +288,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Reset your password",
+                      "Create your new account",
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 23,
@@ -340,7 +315,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                         keyboardType: TextInputType.phone,
                         style: const TextStyle(
                             fontSize: 16, height: 0.8, letterSpacing: 0.0001),
-                        focusNode: _codeFocusNode, // Attach the FocusNode
+                        focusNode: _codeFocusNode,
                         decoration: Common.customDecoration2(
                             labelText: 'Verification Code'),
                         validator: (value) {
@@ -362,7 +337,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
               child: Column(
                 children: [
                   TextButton(
-                    onPressed: _verifyCode,
+                    onPressed: () {
+                      _verifyCode(context);
+                    },
                     style: Common.customButtonStyle(
                         backgroundColorHover:
                             const Color.fromARGB(255, 91, 198, 251),
@@ -386,48 +363,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
     );
   }
 
-  // Widget _buildVerificationCodeTab() {
-  //   return Center(
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(16.0),
-  //       child: Column(
-  //         mainAxisSize: MainAxisSize.min, // Centers the Column's content
-  //         crossAxisAlignment: CrossAxisAlignment.center,
-  //         children: [
-  //           const Text(
-  //             'Enter the verification code sent to your phone:',
-  //             style: TextStyle(fontSize: 16),
-  //           ),
-  //           const SizedBox(height: 20),
-  //           TextFormField(
-  //             controller: _codeController,
-  //             style: const TextStyle(fontSize: 20, height: 0.8),
-  //             keyboardType: TextInputType.number,
-  //             focusNode: _codeFocusNode, // Attach the FocusNode
-  //             decoration: Common.customDecoration(
-  //                 labelText: 'Verification Code',
-  //                 prefixIcon: Icons.verified_user),
-  //             validator: (value) {
-  //               if (value == null || value.isEmpty) {
-  //                 return 'Please enter the verification code';
-  //               }
-  //               return null;
-  //             },
-  //           ),
-  //           const SizedBox(height: 20),
-  //           TextButton(
-  //             onPressed: _verifyCode, // Handle sign-in logic
-  //             style: Common.customButtonStyle(boderSideColor: Colors.black),
-  //             child: const Text(
-  //               'Verify Code',
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildNewPasswordTab2() {
     return Container(
       color: const Color.fromARGB(255, 234, 252, 254).withOpacity(0.3),
@@ -444,7 +379,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Reset your password",
+                      "Create your new account",
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 23,
@@ -452,7 +387,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                           letterSpacing: 0.0000001),
                     ),
                     const Text(
-                      "Please enter your new password",
+                      "Please enter your password",
                       style: TextStyle(
                           height: 2,
                           color: Colors.black,
@@ -490,10 +425,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                             )),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your new password';
+                            return 'Please enter a password';
                           }
                           if (value.length < 6) {
-                            return 'Password must be at least 6 characters long';
+                            return 'Password must be at least 6 characters';
                           }
                           return null;
                         },
@@ -511,7 +446,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                         style: const TextStyle(
                             fontSize: 16, height: 0.8, letterSpacing: 0.0001),
                         decoration: Common.customDecoration2(
-                            labelText: 'Confirm new password',
+                            labelText: 'Confirm your password',
                             suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -523,10 +458,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
                                     : Icons.remove_red_eye))),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your new password again';
+                            return 'Please enter your password again';
                           }
                           if (value != _passwordController.text.trim()) {
-                            return 'Your new password does not match';
+                            return 'Your confirm password does not match';
                           }
                           return null;
                         },
@@ -543,7 +478,99 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
               child: Column(
                 children: [
                   TextButton(
-                    onPressed: _resetPassword,
+                    onPressed: () {
+                      _setPassword(context);
+                    },
+                    style: Common.customButtonStyle(
+                        backgroundColorHover:
+                            const Color.fromARGB(255, 91, 198, 251),
+                        textColorHover: const Color.fromARGB(255, 6, 45, 102),
+                        backgroundColor: Colors.blue,
+                        textColor: Colors.white,
+                        circular: 4,
+                        size: const Size(300, 50),
+                        boderSideColor:
+                            const Color.fromARGB(255, 91, 198, 251)),
+                    child: const Text(
+                      'Continue',
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccountDetailsTab2() {
+    return Container(
+      color: const Color.fromARGB(255, 234, 252, 254).withOpacity(0.3),
+      child: Column(
+        children: [
+          Expanded(
+            flex: 7,
+            child: Container(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Create your new account",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 23,
+                          fontWeight: FontWeight.w300,
+                          letterSpacing: 0.0000001),
+                    ),
+                    const Text(
+                      "Please enter your account name",
+                      style: TextStyle(
+                          height: 1.5,
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          letterSpacing: 0.0000001),
+                    ),
+                    SizedBox.fromSize(size: const Size(0, 24)),
+                    Material(
+                      shadowColor: Colors.blue.shade500.withOpacity(0.3),
+                      elevation: 2.8,
+                      child: TextFormField(
+                        cursorColor: Colors.blue.shade400,
+                        textAlignVertical: const TextAlignVertical(y: 1),
+                        controller: _nameController,
+                        style: const TextStyle(
+                            fontSize: 16, height: 0.8, letterSpacing: 0.0001),
+                        focusNode: _nameFocusNode,
+                        decoration:
+                            Common.customDecoration2(labelText: 'Account name'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              child: Column(
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      _saveAccount(context);
+                    },
                     style: Common.customButtonStyle(
                         backgroundColorHover:
                             const Color.fromARGB(255, 91, 198, 251),
